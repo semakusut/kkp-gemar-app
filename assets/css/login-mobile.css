@@ -1,0 +1,282 @@
+/* ============================================================
+   GEMAR-KKP — Mobile/PWA Login Styles
+   Simple, focused login for mobile apps
+   ============================================================ */
+
+/* Mobile-only elements */
+.mobile-only {
+    display: none;
+}
+
+.desktop-only {
+    display: block;
+}
+
+.form__mobile-intro {
+    display: none;
+}
+
+/* PWA Standalone Mode */
+@media (display-mode: standalone), (max-width: 767px) {
+    .mobile-only {
+        display: block;
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
+
+    .page__visual,
+    .page__visual--desktop {
+        display: none !important;
+    }
+
+    .form__desktop-header {
+        display: none;
+    }
+
+    .mobile-header--hide {
+        display: flex;
+    }
+
+    .form__mobile-intro {
+        display: block;
+    }
+
+    .form__mobile-logo--show {
+        display: block;
+    }
+
+    .page {
+        grid-template-columns: 1fr !important;
+        min-height: 100vh;
+        background: linear-gradient(165deg, #0A3D5C 0%, #0E5575 60%, #0F6980 100%);
+    }
+
+    .page__form {
+        padding: 24px 20px;
+        background: transparent;
+        justify-content: center;
+    }
+
+    .form {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 32px 24px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .form__mobile-logo--show {
+        margin-bottom: 8px;
+    }
+
+    .form__mobile-logo--show img {
+        height: 48px;
+    }
+
+    .form__mobile-intro {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .form__mobile-intro .form__title {
+        font-size: 28px;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 6px;
+    }
+
+    .form__mobile-intro .form__title em {
+        font-style: italic;
+    }
+
+    .form__mobile-intro .form__description {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+        margin: 0;
+    }
+
+    .form__title,
+    .form__description,
+    .form__eyebrow,
+    .form__corner {
+        color: white;
+    }
+
+    .form__corner {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .field__label {
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .field__input {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .field__input::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .field__input:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--teal-200);
+        box-shadow: 0 0 0 3px rgba(74, 207, 166, 0.2);
+    }
+
+    .field__icon {
+        stroke: rgba(255, 255, 255, 0.5);
+    }
+
+    .field__toggle {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .field__toggle:hover {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .form__row {
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .checkbox span {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .checkbox__box {
+        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .checkbox input:checked + .checkbox__box {
+        background: var(--teal-200);
+        border-color: var(--teal-200);
+    }
+
+    .checkbox input:checked + .checkbox__box::after {
+        border-color: #0A3D5C;
+    }
+
+    .form__forgot {
+        color: var(--teal-200);
+    }
+
+    .btn {
+        background: var(--teal-400);
+        width: 100%;
+        justify-content: center;
+        padding: 16px 24px;
+        font-size: 16px;
+    }
+
+    .btn:hover {
+        background: var(--teal-300);
+    }
+
+    .btn__arrow {
+        margin-left: 8px;
+    }
+
+    .form__footer.mobile-only {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 13px;
+    }
+
+    .form__footer.mobile-only a {
+        color: var(--teal-200);
+        font-weight: 600;
+    }
+
+    .form__error {
+        background: rgba(220, 38, 38, 0.15);
+        border-color: rgba(220, 38, 38, 0.4);
+        color: #FECACA;
+    }
+
+    .field__input--error {
+        border-color: #DC2626 !important;
+        background: rgba(220, 38, 38, 0.15) !important;
+    }
+}
+
+/* PWA Header (mobile app bar) */
+.mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: rgba(10, 61, 92, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+}
+
+@media (display-mode: standalone), (max-width: 767px) {
+    .mobile-header {
+        display: flex;
+    }
+
+    .page {
+        padding-top: 56px;
+    }
+}
+
+.mobile-header__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 0.5px;
+}
+
+.mobile-header__logo {
+    width: 32px;
+    height: 32px;
+}
+
+/* Landscape mobile - keep compact */
+@media (max-width: 767px) and (orientation: landscape) {
+    .form {
+        padding: 20px;
+    }
+
+    .form__mobile-intro {
+        margin-bottom: 16px;
+    }
+
+    .form__mobile-intro .form__title {
+        font-size: 22px;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+    .form {
+        padding: 24px 16px;
+        border-radius: 16px;
+    }
+
+    .form__mobile-intro .form__title {
+        font-size: 24px;
+    }
+
+    .btn {
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+}
