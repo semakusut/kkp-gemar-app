@@ -182,6 +182,24 @@
     <script src="assets/js/auth.js"></script>
     <script>
         (function() {
+            // Handle error from redirect
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            if (error) {
+                const form = document.querySelector('.form');
+                let errorContainer = document.getElementById('error-message');
+                if (!errorContainer) {
+                    errorContainer = document.createElement('div');
+                    errorContainer.id = 'error-message';
+                    errorContainer.className = 'form__error form__error--visible';
+                    form.insertBefore(errorContainer, form.firstChild);
+                }
+                errorContainer.textContent = error;
+                
+                // Clear URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('/sw.js')

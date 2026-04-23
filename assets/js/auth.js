@@ -1,196 +1,74 @@
 /**
  * auth.js — GEMAR-KKP Authentication
- * Handles login, logout, session management
+ * Using form submit to bypass CORS
  */
 
 const AUTH_CONFIG = {
-  apiUrl: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec',
+  apiUrl: 'https://script.google.com/macros/s/AKfycbybBbrfZHBDD7VjvcdLEQ2Xtdn9wwJTtqHkQ44OVLDfR3zsphcKM-VCW_WXc_Zkrbsn/exec',
   tokenKey: 'gemar_token',
   userKey: 'gemar_user',
   rememberKey: 'gemar_remember'
 };
 
-function getClientIp() {
-  return fetch('https://api.ipify.org?format=json')
-    .then(res => res.json())
-    .then(data => data.ip)
-    .catch(() => 'unknown');
+function togglePassword() {
+  const input = document.getElementById('password');
+  const icon = document.getElementById('eye-icon');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><path d="M1 1l22 22"/>';
+  } else {
+    input.type = 'password';
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
 }
 
 function handleLogin() {
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
-  const rememberCheckbox = document.querySelector('.checkbox input');
-  const submitBtn = document.querySelector('.btn');
-  const errorContainer = createErrorContainer();
-
   const email = emailInput.value.trim();
   const password = passwordInput.value;
-  const remember = rememberCheckbox ? rememberCheckbox.checked : false;
 
-  errorContainer.remove();
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<span class="btn__spinner"></span> Memasuki...';
-
-  if (!validateEmail(email)) {
-    showError(errorContainer, 'Format email tidak valid', emailInput);
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = 'Masuk ke GEMAR-KKP<svg class="btn__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  if (!email || !password) {
+    alert('Email dan password wajib diisi');
     return;
   }
 
-  if (!validatePassword(password)) {
-    showError(errorContainer, 'Password minimal 8 karakter', passwordInput);
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = 'Masuk ke GEMAR-KKP<svg class="btn__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-    return;
-  }
+  const form = document.createElement('form');
+  form.method = 'GET';
+  form.action = AUTH_CONFIG.apiUrl;
+  form.target = '_self';
 
-  getClientIp().then(clientIp => {
-    const payload = {
-      email: email,
-      password: password,
-      ip: clientIp
-    };
+  const fields = [
+    { name: 'action', value: 'auth.login' },
+    { name: 'email', value: email },
+    { name: 'password', value: password },
+    { name: 'ip', value: '' }
+  ];
 
-    fetch(AUTH_CONFIG.apiUrl + '?action=auth.login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = 'Masuk ke GEMAR-KKP<svg class="btn__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-
-      if (data.success) {
-        setToken(data.data.token, remember);
-        setUser(data.data.user, remember);
-
-        if (data.data.user.role === 'superadmin') {
-          window.location.href = 'admin.html';
-        } else if (data.data.user.role === 'eselon1') {
-          window.location.href = 'dashboard.html';
-        } else {
-          window.location.href = 'dashboard.html';
-        }
-      } else {
-        showError(errorContainer, data.error, emailInput);
-
-        if (data.code === 429) {
-          emailInput.disabled = true;
-          passwordInput.disabled = true;
-          submitBtn.disabled = true;
-          const waitMatch = data.error.match(/(\d+)\s*menit/);
-          if (waitMatch) {
-            setTimeout(() => {
-              emailInput.disabled = false;
-              passwordInput.disabled = false;
-              submitBtn.disabled = false;
-            }, parseInt(waitMatch[1]) * 60 * 1000);
-          }
-        }
-      }
-    })
-    .catch(err => {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = 'Masuk ke GEMAR-KKP<svg class="btn__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-      showError(errorContainer, 'Tidak dapat terhubung ke server. Periksa koneksi internet.', emailInput);
-      console.error('Login error:', err);
-    });
+  fields.forEach(f => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = f.name;
+    input.value = f.value;
+    form.appendChild(input);
   });
+
+  document.body.appendChild(form);
+  form.submit();
 }
 
 function handleLogout() {
-  const token = getToken();
-
-  if (token) {
-    fetch(AUTH_CONFIG.apiUrl + '?action=auth.logout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ token: token })
-    }).catch(() => {});
-  }
-
   clearSession();
   window.location.href = 'index.html';
 }
 
 function verifySession() {
-  const token = getToken();
   const user = getUser();
-
-  if (!token || !user) {
+  if (!user) {
     clearSession();
     return false;
   }
-
-  fetch(AUTH_CONFIG.apiUrl + '?action=auth.verify', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ token: token })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (!data.success) {
-      clearSession();
-      window.location.href = 'index.html';
-    }
-  })
-  .catch(() => {
-    clearSession();
-    window.location.href = 'index.html';
-  });
-
   return true;
-}
-
-function validateEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-function validatePassword(password) {
-  return password && password.length >= 8;
-}
-
-function createErrorContainer() {
-  const form = document.querySelector('.form');
-  let errorContainer = document.getElementById('error-message');
-
-  if (!errorContainer) {
-    errorContainer = document.createElement('div');
-    errorContainer.id = 'error-message';
-    errorContainer.className = 'form__error';
-    form.insertBefore(errorContainer, form.firstChild);
-  }
-
-  return errorContainer;
-}
-
-function showError(container, message, inputElement) {
-  container.textContent = message;
-  container.classList.add('form__error--visible');
-
-  if (inputElement) {
-    inputElement.classList.add('field__input--error');
-
-    inputElement.addEventListener('input', function handler() {
-      inputElement.classList.remove('field__input--error');
-      container.classList.remove('form__error--visible');
-      inputElement.removeEventListener('input', handler);
-    });
-  }
-
-  setTimeout(() => {
-    container.classList.remove('form__error--visible');
-  }, 5000);
 }
 
 function setToken(token, remember) {
@@ -199,7 +77,6 @@ function setToken(token, remember) {
     localStorage.setItem(AUTH_CONFIG.rememberKey, 'true');
   } else {
     sessionStorage.setItem(AUTH_CONFIG.tokenKey, token);
-    localStorage.removeItem(AUTH_CONFIG.rememberKey);
   }
 }
 
@@ -209,7 +86,6 @@ function getToken() {
 
 function setUser(user, remember) {
   const userData = JSON.stringify(user);
-
   if (remember) {
     localStorage.setItem(AUTH_CONFIG.userKey, userData);
   } else {
@@ -225,20 +101,11 @@ function getUser() {
 function clearSession() {
   localStorage.removeItem(AUTH_CONFIG.tokenKey);
   localStorage.removeItem(AUTH_CONFIG.userKey);
-  localStorage.removeItem(AUTH_CONFIG.rememberKey);
   sessionStorage.removeItem(AUTH_CONFIG.tokenKey);
   sessionStorage.removeItem(AUTH_CONFIG.userKey);
 }
 
 function initAuth() {
-  const remember = localStorage.getItem(AUTH_CONFIG.rememberKey);
-  if (remember === 'true') {
-    const user = getUser();
-    if (user) {
-      verifySession();
-    }
-  }
-
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
       handleLogin();
