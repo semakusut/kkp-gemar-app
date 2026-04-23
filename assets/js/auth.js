@@ -203,3 +203,76 @@ function requireAuth() {
   }
   return getUser();
 }
+
+// ── Offline Queue Manager (Background Sync) ───────────────────────────────────
+
+const QUEUE_KEY = 'gemar_offline_queue';
+
+function getQueue_() {
+  try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); }
+  catch (e) { return []; }
+}
+
+function saveQueue_(q) {
+  localStorage.setItem(QUEUE_KEY, JSON.stringify(q));
+}
+
+/**
+ * Memasukkan request ke queue dan langsung merespons sukses ke UI (Optimistic).
+ * Background worker akan memproses queue.
+ */
+function enqueueRequest(payload) {
+  var q = getQueue_();
+  q.push({
+    id: Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+    timestamp: Date.now(),
+    payload: payload
+  });
+  saveQueue_(q);
+  processQueue(); // Trigger pemrosesan di background
+  return Promise.resolve({ success: true, optimistic: true });
+}
+
+var isProcessingQueue = false;
+
+async function processQueue() {
+  if (isProcessingQueue || !navigator.onLine) return;
+  
+  var q = getQueue_();
+  if (q.length === 0) return;
+  
+  isProcessingQueue = true;
+  
+  // Ambil item pertama
+  var item = q[0];
+  
+  try {
+    var body = new URLSearchParams(item.payload);
+    var response = await fetch(AUTH_CONFIG.apiUrl, {
+      method: 'POST',
+      body: body
+    });
+    
+    if (response.ok) {
+      // Sukses, hapus dari queue
+      q = getQueue_(); // Refresh queue (in case it changed)
+      q = q.filter(function(x) { return x.id !== item.id; });
+      saveQueue_(q);
+    }
+  } catch (err) {
+    console.error('[Background Sync] Gagal mengirim data', err);
+    // Biarkan di queue untuk retry nanti
+  } finally {
+    isProcessingQueue = false;
+    // Coba proses sisa queue
+    if (getQueue_().length > 0) {
+      setTimeout(processQueue, 3000); // Jeda 3 detik
+    }
+  }
+}
+
+// Auto-run saat koneksi kembali online
+window.addEventListener('online', processQueue);
+
+// Jalankan sekali saat script dimuat (misal saat buka dashboard)
+setTimeout(processQueue, 1000);
