@@ -140,54 +140,25 @@
         </main>
     </div>
 
+    <script src="assets/js/auth.js"></script>
     <script>
-        // Get user data from URL
-        const params = new URLSearchParams(window.location.search);
-        const token = params.get('token');
-        const userParam = params.get('user');
+        // requireAuth() cek token di localStorage/sessionStorage dan validasi expiry
+        const user = requireAuth();
+        if (!user) throw new Error('redirect to login');
 
-        if (!token || !userParam) {
-            window.location.href = 'index.html';
-            throw new Error('No session');
-        }
-
-        let user;
-        try {
-            user = JSON.parse(decodeURIComponent(userParam));
-        } catch (e) {
-            window.location.href = 'index.html';
-            throw new Error('Invalid user data');
-        }
-
-        // Clear URL
-        window.history.replaceState({}, document.title, 'dashboard.html');
-
-        // Display user info
-        document.getElementById('userName').textContent = user.name || 'User';
-        
         const roleLabels = {
-            'upt_admin': 'Admin UPT',
-            'eselon1': 'Sekretaris',
+            'upt_admin':  'Admin UPT',
+            'eselon1':    'Sekretaris Ditjen / Badan',
             'superadmin': 'Sekretaris Jenderal'
         };
+        document.getElementById('userName').textContent = user.name || 'User';
         document.getElementById('userRole').textContent = roleLabels[user.role] || user.role;
 
-        // Show role-specific buttons
         if (user.role === 'eselon1' || user.role === 'superadmin') {
             document.getElementById('approvalBtn').style.display = 'flex';
         }
         if (user.role === 'superadmin') {
             document.getElementById('adminBtn').style.display = 'flex';
-        }
-
-        // Save session
-        localStorage.setItem('gemar_token', token);
-        localStorage.setItem('gemar_user', JSON.stringify(user));
-
-        function handleLogout() {
-            localStorage.removeItem('gemar_token');
-            localStorage.removeItem('gemar_user');
-            window.location.href = 'index.html';
         }
     </script>
 </body>

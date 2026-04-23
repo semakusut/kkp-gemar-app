@@ -182,31 +182,13 @@
     <script src="assets/js/auth.js"></script>
     <script>
         (function() {
-            // Handle error from redirect
-            const urlParams = new URLSearchParams(window.location.search);
-            const error = urlParams.get('error');
-            if (error) {
-                const form = document.querySelector('.form');
-                let errorContainer = document.getElementById('error-message');
-                if (!errorContainer) {
-                    errorContainer = document.createElement('div');
-                    errorContainer.id = 'error-message';
-                    errorContainer.className = 'form__error form__error--visible';
-                    form.insertBefore(errorContainer, form.firstChild);
-                }
-                errorContainer.textContent = error;
-                
-                // Clear URL
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-
             if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
+                window.addEventListener('load', function() {
                     navigator.serviceWorker.register('/sw.js')
-                        .then((reg) => console.log('[SW] Registered:', reg.scope))
-                        .catch((err) => console.error('[SW] Failed:', err));
+                        .then(function(reg) { console.log('[SW] Registered:', reg.scope); })
+                        .catch(function(err) { console.error('[SW] Failed:', err); });
 
-                    navigator.serviceWorker.addEventListener('message', (event) => {
+                    navigator.serviceWorker.addEventListener('message', function(event) {
                         if (event.data.type === 'NEW_VERSION_AVAILABLE') {
                             if (confirm('GEMAR-KKP telah diperbarui. Muat ulang sekarang?')) {
                                 window.location.reload();
@@ -216,12 +198,9 @@
                 });
             }
 
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-            const isMobile = window.innerWidth < 768;
-
-            if (isStandalone || isMobile) {
-                document.body.classList.add('pwa-mode');
-            }
+            var isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+            var isMobile     = window.innerWidth < 768;
+            if (isStandalone || isMobile) document.body.classList.add('pwa-mode');
         })();
     </script>
 </body>
