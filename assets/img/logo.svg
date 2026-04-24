@@ -1,40 +1,98 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
-  <!-- ===== CLIP PATH: rounded square mask ===== -->
   <defs>
     <clipPath id="iconMask">
       <rect width="120" height="120" rx="28"/>
     </clipPath>
+
+    <!-- Background: very dark navy → deep navy → electric blue -->
+    <linearGradient id="bgGradient" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#0D0F22"/>
+      <stop offset="45%"  stop-color="#1B2068"/>
+      <stop offset="100%" stop-color="#3535EE"/>
+    </linearGradient>
+
+    <!-- Shimmer highlight (top-left diagonal) -->
+    <linearGradient id="shimmerGradient" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#5A5EF5" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#1B2068" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Sun: keep gold -->
+    <radialGradient id="sunGradient" cx="0.4" cy="0.4">
+      <stop offset="0%"   stop-color="#FFE066"/>
+      <stop offset="60%"  stop-color="#F4B400"/>
+      <stop offset="100%" stop-color="#E89B00"/>
+    </radialGradient>
+    <radialGradient id="sunGlow" cx="0.5" cy="0.5">
+      <stop offset="0%"   stop-color="#FFE066" stop-opacity="0.45"/>
+      <stop offset="70%"  stop-color="#F4B400" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#F4B400" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Text gradient: white top → gold bottom -->
+    <linearGradient id="textGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#FFE066"/>
+    </linearGradient>
+
+    <!-- Subtle glow behind KKP text -->
+    <radialGradient id="textBackdrop" cx="0.5" cy="0.5">
+      <stop offset="0%"   stop-color="#FFFFFF" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Waves: white at different opacities for ocean effect -->
+    <linearGradient id="waveBackGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E8ECFF"/>
+    </linearGradient>
+    <linearGradient id="waveMidGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F0F2FF"/>
+    </linearGradient>
+    <linearGradient id="waveFrontGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </linearGradient>
+
+    <!-- Leaf: keep green accent -->
+    <linearGradient id="leafGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#6BCF7F"/>
+      <stop offset="100%" stop-color="#2D9E3C"/>
+    </linearGradient>
   </defs>
 
-  <!-- ===== ALL CONTENT MASKED INSIDE ROUNDED SQUARE ===== -->
+  <!-- All content clipped inside rounded square -->
   <g clip-path="url(#iconMask)">
 
     <!-- Background -->
     <rect width="120" height="120" fill="url(#bgGradient)"/>
-    <rect width="120" height="120" fill="url(#shimmerGradient)" opacity="0.4"/>
+    <rect width="120" height="120" fill="url(#shimmerGradient)" opacity="0.5"/>
 
-    <!-- ===== SKY ZONE (y: 0–35) ===== -->
+    <!-- ── SKY ZONE ─────────────────────────────── -->
 
     <!-- Sun (top-right) -->
-    <circle cx="92" cy="22" r="9" fill="url(#sunGradient)"/>
+    <circle cx="92" cy="22" r="9"  fill="url(#sunGradient)"/>
     <circle cx="92" cy="22" r="13" fill="url(#sunGlow)" opacity="0.5"/>
+    <!-- Lightning bolt in sun -->
     <path d="M 90.5 17.5 L 88 23.5 L 90.5 23.5 L 89 28 L 94.5 21 L 91.5 21 L 93 17.5 Z"
           fill="#FFF9E5"/>
 
     <!-- Leaf (top-left) -->
-    <g transform="translate(20, 20)">
+    <g transform="translate(20,20)">
       <path d="M 0 0 Q 4 -10, 14 -6 Q 10 4, 0 0 Z" fill="url(#leafGradient)"/>
-      <path d="M 2 -2 L 10 -6" stroke="#1A5F3F" stroke-width="0.5" opacity="0.5" stroke-linecap="round"/>
+      <path d="M 2 -2 L 10 -6" stroke="#1A5F3F" stroke-width="0.5"
+            opacity="0.5" stroke-linecap="round"/>
     </g>
 
     <!-- Sparkles -->
     <circle cx="70" cy="14" r="1.2" fill="#FFE066" opacity="0.9"/>
-    <circle cx="76" cy="9" r="0.8" fill="#FFE066" opacity="0.7"/>
-    <circle cx="44" cy="11" r="1" fill="#FFE066" opacity="0.6"/>
+    <circle cx="76" cy="9"  r="0.8" fill="#FFE066" opacity="0.7"/>
+    <circle cx="44" cy="11" r="1.0" fill="#FFE066" opacity="0.6"/>
 
-    <!-- ===== KKP TEXT ZONE (y: 38–82) ===== -->
+    <!-- ── KKP TEXT ZONE ───────────────────────── -->
 
-    <!-- Subtle backdrop circle behind text for emphasis -->
+    <!-- Glow backdrop behind text -->
     <circle cx="60" cy="60" r="32" fill="url(#textBackdrop)" opacity="0.15"/>
 
     <!-- KKP main text -->
@@ -46,95 +104,24 @@
           text-anchor="middle"
           fill="url(#textGradient)">KKP</text>
 
-    <!-- Small underline accent below KKP -->
-    <line x1="50" y1="80" x2="70" y2="80" stroke="#FFE066" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+    <!-- Gold underline accent -->
+    <line x1="50" y1="80" x2="70" y2="80"
+          stroke="#FFE066" stroke-width="1.5"
+          stroke-linecap="round" opacity="0.85"/>
 
-    <!-- ===== WATER ZONE — clipped automatically ===== -->
+    <!-- ── WATER ZONE ──────────────────────────── -->
 
     <!-- Back wave -->
-    <path d="M -5 98
-             Q 20 93, 40 98
-             T 80 98
-             T 125 98
-             L 125 122
-             L -5 122 Z"
-          fill="url(#waveBackGradient)" opacity="0.55"/>
+    <path d="M -5 98 Q 20 93, 40 98 T 80 98 T 125 98 L 125 122 L -5 122 Z"
+          fill="url(#waveBackGradient)" opacity="0.18"/>
 
     <!-- Middle wave -->
-    <path d="M -5 103
-             Q 22 98, 44 103
-             T 82 103
-             T 125 103
-             L 125 122
-             L -5 122 Z"
-          fill="url(#waveMidGradient)" opacity="0.75"/>
+    <path d="M -5 103 Q 22 98, 44 103 T 82 103 T 125 103 L 125 122 L -5 122 Z"
+          fill="url(#waveMidGradient)" opacity="0.30"/>
 
     <!-- Front wave -->
-    <path d="M -5 108
-             Q 24 103, 48 108
-             T 86 108
-             T 125 108
-             L 125 122
-             L -5 122 Z"
-          fill="url(#waveFrontGradient)"/>
+    <path d="M -5 108 Q 24 103, 48 108 T 86 108 T 125 108 L 125 122 L -5 122 Z"
+          fill="url(#waveFrontGradient)" opacity="0.50"/>
 
   </g>
-
-  <!-- ===== GRADIENT DEFINITIONS ===== -->
-  <defs>
-    <linearGradient id="bgGradient" x1="0" y1="0" x2="120" y2="120">
-      <stop offset="0%" stop-color="#0A3D5C"/>
-      <stop offset="50%" stop-color="#0E5575"/>
-      <stop offset="100%" stop-color="#0F6980"/>
-    </linearGradient>
-
-    <linearGradient id="shimmerGradient" x1="0" y1="0" x2="120" y2="120">
-      <stop offset="0%" stop-color="#1A7A9A" stop-opacity="0.3"/>
-      <stop offset="100%" stop-color="#0A3D5C" stop-opacity="0"/>
-    </linearGradient>
-
-    <radialGradient id="sunGradient" cx="0.4" cy="0.4">
-      <stop offset="0%" stop-color="#FFE066"/>
-      <stop offset="60%" stop-color="#F4B400"/>
-      <stop offset="100%" stop-color="#E89B00"/>
-    </radialGradient>
-
-    <radialGradient id="sunGlow" cx="0.5" cy="0.5">
-      <stop offset="0%" stop-color="#FFE066" stop-opacity="0.5"/>
-      <stop offset="70%" stop-color="#F4B400" stop-opacity="0.15"/>
-      <stop offset="100%" stop-color="#F4B400" stop-opacity="0"/>
-    </radialGradient>
-
-    <!-- Text gradient: cream to soft white for readability on dark bg -->
-    <linearGradient id="textGradient" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#FFFFFF"/>
-      <stop offset="100%" stop-color="#FFE066"/>
-    </linearGradient>
-
-    <!-- Subtle backdrop behind text -->
-    <radialGradient id="textBackdrop" cx="0.5" cy="0.5">
-      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.4"/>
-      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
-    </radialGradient>
-
-    <linearGradient id="waveBackGradient" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2D9E7C"/>
-      <stop offset="100%" stop-color="#1A7A5E"/>
-    </linearGradient>
-
-    <linearGradient id="waveMidGradient" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#34B890"/>
-      <stop offset="100%" stop-color="#2D9E7C"/>
-    </linearGradient>
-
-    <linearGradient id="waveFrontGradient" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#4ACFA6"/>
-      <stop offset="100%" stop-color="#2D9E7C"/>
-    </linearGradient>
-
-    <linearGradient id="leafGradient" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#6BCF7F"/>
-      <stop offset="100%" stop-color="#2D9E3C"/>
-    </linearGradient>
-  </defs>
 </svg>

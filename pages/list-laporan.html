@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1B2068" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="GEMAR-KKP" />
+    <link rel="apple-touch-icon" href="../assets/img/logo.svg" />
+    <title>GEMAR-KKP · List Laporan</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../assets/css/gemar-style.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
+    <script src="../assets/js/loader.js"></script>
+
+    <style>
+        .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .page-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; }
+        .page-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; }
+        .page-subtitle { color: var(--text-muted); font-size: 0.9375rem; }
+        
+        .card {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .table-wrap { overflow-x: auto; }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        .data-table th, .data-table td {
+            padding: 1rem 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .data-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .data-table tbody tr:hover { background: #f8fafc; }
+        
+        .status { display: inline-block; padding: 0.25rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
+        .status--pending { background: #FEF3C7; color: #92400E; }
+        .status--approved { background: #D1FAE5; color: #065F46; }
+        .status--rejected { background: #FEE2E2; color: #991B1B; }
+        
+        .actions { display: flex; gap: 0.375rem; }
+        .btn {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: var(--radius-md);
+            background: var(--surface-main);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn:hover { background: var(--border-color); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn--danger { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
+        .btn--danger:hover { background: #FECACA; }
+        .btn--primary { background: var(--primary-main); color: #fff; border-color: var(--primary-main); }
+        
+        .empty { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+        .empty svg { width: 64px; height: 64px; margin-bottom: 1rem; opacity: 0.4; }
+        .empty p { margin-bottom: 1.5rem; }
+        
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background: #f8fafc;
+            border-top: 1px solid var(--border-color);
+        }
+        .pagination__info { font-size: 0.875rem; color: var(--text-muted); }
+        .pagination__btns { display: flex; gap: 0.5rem; }
+
+        /* ── Mobile card layout ─────────────────────────────────── */
+        @media (max-width: 640px) {
+            .container { padding: 1rem; }
+            .page-header { flex-direction: column; gap: 0.75rem; }
+            .page-header .btn--primary { align-self: flex-start; }
+
+            .table-wrap { overflow-x: visible; }
+            .data-table thead { display: none; }
+
+            .data-table tbody tr {
+                display: block;
+                padding: 0.875rem 1rem;
+                border-bottom: 1px solid var(--border-color);
+                position: relative;
+            }
+            .data-table tbody tr:last-child { border-bottom: none; }
+            .data-table tbody tr:hover { background: transparent; }
+
+            .data-table tbody td {
+                display: block;
+                padding: 0;
+                border-bottom: none;
+            }
+
+            /* Bulan — inline bold title */
+            .data-table tbody td:not([colspan]):nth-child(1) {
+                display: inline;
+                font-weight: 600;
+                font-size: 0.9375rem;
+                color: var(--text-main);
+            }
+
+            /* Tahun — inline right after Bulan */
+            .data-table tbody td:not([colspan]):nth-child(2) {
+                display: inline;
+                color: var(--text-muted);
+                font-size: 0.875rem;
+                margin-left: 0.25rem;
+            }
+
+            /* Total Biaya — block below title, leave room for badge */
+            .data-table tbody td:not([colspan]):nth-child(3) {
+                display: block;
+                font-size: 0.9375rem;
+                font-weight: 500;
+                color: var(--navy, #1B2068);
+                margin-top: 0.3rem;
+                padding-right: 90px;
+            }
+
+            /* Status badge — pinned top-right */
+            .data-table tbody td:not([colspan]):nth-child(4) {
+                display: block;
+                position: absolute;
+                top: 0.875rem;
+                right: 1rem;
+            }
+
+            /* Aksi — full-width button row */
+            .data-table tbody td:not([colspan]):nth-child(5) {
+                display: block;
+                margin-top: 0.75rem;
+            }
+            .data-table tbody td:not([colspan]):nth-child(5) .actions {
+                display: flex;
+                gap: 0.5rem;
+            }
+            .data-table tbody td:not([colspan]):nth-child(5) .btn {
+                flex: 1;
+                min-height: 40px;
+                padding: 0.5rem 0.375rem;
+                font-size: 0.8125rem;
+                justify-content: center;
+            }
+
+            /* Empty-state cell — reset overrides above */
+            .data-table td[colspan] {
+                display: block !important;
+                position: static !important;
+                padding: 2.5rem 1rem !important;
+            }
+
+            /* Pagination on narrow screens */
+            .pagination { flex-direction: column; gap: 0.625rem; text-align: center; }
+            .pagination__btns .btn { padding: 0.5rem 1.25rem; min-height: 40px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <header class="header">
+            <div class="header__brand">
+                <img src="../assets/img/logo.svg" class="header__logo" alt="GEMAR-KKP">
+                <span class="header__title">GEMAR-KKP</span>
+            </div>
+            <nav class="header__nav">
+                <a href="dashboard.html" class="header__link">Dashboard</a>
+                <a href="list-laporan.html" class="header__link header__link--active">List Laporan</a>
+                <button class="header__btn header__btn--logout" onclick="handleLogout()">Logout</button>
+            </nav>
+        </header>
+
+        <main class="main">
+            <div class="container">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Riwayat Laporan</h1>
+                        <p class="page-subtitle">Kelola dan lihat riwayat laporan bulanan Anda</p>
+                    </div>
+                    <a href="laporan-bulanan.html" class="btn btn--primary">+ Buat Laporan</a>
+                </div>
+
+                <div class="card">
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Bulan</th>
+                                    <th>Tahun</th>
+                                    <th>Total Biaya</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr>
+                                    <td colspan="5" class="empty">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path d="M9 12h6M9 16h6M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        <p>Belum ada laporan</p>
+                                        <a href="laporan-bulanan.html" class="btn btn--primary">Buat Laporan Pertama</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="pagination" style="display:none">
+                        <div class="pagination__info" id="paginationInfo"></div>
+                        <div class="pagination__btns">
+                            <button class="btn" id="prevBtn" onclick="changePage(-1)">← Prev</button>
+                            <button class="btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/js/auth.js"></script>
+    <script>
+        const user = requireAuth();
+        if (!user) throw new Error('redirect to login');
+
+        const LIMIT = 15;
+        let offset = 0;
+        let total = 0;
+        let currentData = [];
+
+        const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        function formatRupiah(num) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
+        }
+
+        function getStatusLabel(status) {
+            const labels = { 'pending_approval': 'Menunggu', 'approved': 'Disetujui', 'rejected': 'Ditolak' };
+            return labels[status] || status;
+        }
+
+        function loadData() {
+            PageLoader.start('Memuat riwayat laporan...');
+            fetch(AUTH_CONFIG.apiUrl, {
+                method: 'POST',
+                body: new URLSearchParams({
+                    action: 'report.monthly.list',
+                    token: getToken(),
+                    limit: LIMIT,
+                    offset: offset
+                })
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (!res.success) {
+                    PageLoader.error(res.error || 'Gagal memuat laporan.', loadData);
+                    return;
+                }
+                total = res.data.total || 0;
+                currentData = res.data.reports || [];
+                render(currentData);
+                updatePagination();
+                PageLoader.finish();
+            })
+            .catch(err => {
+                PageLoader.error(
+                    'Koneksi ke server gagal. Periksa koneksi internet Anda.\n(' + err.message + ')',
+                    loadData
+                );
+            });
+        }
+
+        function render(data) {
+            const tbody = document.getElementById('tableBody');
+            if (!data.length) return;
+
+            let html = '';
+            data.forEach(r => {
+                const bulan = BULAN[parseInt(r.bulan) - 1];
+                const total = (parseFloat(r.listrik_harga)||0) + (parseFloat(r.air_harga)||0) + (parseFloat(r.telepon_harga)||0);
+                const statusClass = r.status === 'approved' ? 'status--approved' : r.status === 'rejected' ? 'status--rejected' : 'status--pending';
+                const canEdit = r.status !== 'approved';
+                const canDelete = r.status !== 'approved';
+
+                html += `<tr>
+                    <td style="font-weight:500">${bulan}</td>
+                    <td>${r.tahun}</td>
+                    <td style="font-weight:500">${formatRupiah(total)}</td>
+                    <td><span class="status ${statusClass}">${getStatusLabel(r.status)}</span></td>
+                    <td>
+                        <div class="actions">
+                            <a href="preview-laporan.html?id=${r.id}" class="btn" title="Preview">Pratinjau</a>
+                            ${canEdit ? `<a href="laporan-bulanan.html?edit=${r.id}" class="btn" title="Edit">Edit</a>` : ''}
+                            ${canDelete ? `<button class="btn btn--danger" onclick="hapus('${r.id}')" title="Hapus">Hapus</button>` : ''}
+                        </div>
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function updatePagination() {
+            const pagDiv = document.getElementById('pagination');
+            const infoDiv = document.getElementById('paginationInfo');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (total <= LIMIT) {
+                pagDiv.style.display = 'none';
+                return;
+            }
+            
+            pagDiv.style.display = 'flex';
+            const start = offset + 1;
+            const end = Math.min(offset + LIMIT, total);
+            infoDiv.textContent = `Menampilkan ${start}-${end} dari ${total} laporan`;
+            
+            prevBtn.disabled = offset === 0;
+            nextBtn.disabled = (offset + LIMIT) >= total;
+        }
+
+        function changePage(delta) {
+            offset += (delta * LIMIT);
+            if (offset < 0) offset = 0;
+            loadData();
+        }
+
+        function hapus(id) {
+            if (!confirm('Hapus laporan ini?')) return;
+            fetch(AUTH_CONFIG.apiUrl, {
+                method: 'POST',
+                body: new URLSearchParams({ action: 'report.monthly.delete', token: getToken(), report_id: id })
+            })
+            .then(r => r.json())
+            .then(res => {
+                alert(res.success ? 'Dihapus' : 'Gagal: ' + res.error);
+                if (res.success) loadData();
+            });
+        }
+
+        if (user.role === 'upt_admin') loadData();
+    </script>
+</body>
+</html>

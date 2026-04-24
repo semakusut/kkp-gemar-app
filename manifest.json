@@ -4,8 +4,8 @@
     "description": "Gerakan Hemat Energi - Sistem Pelaporan Penghematan Energi Kementerian Kelautan dan Perikanan Indonesia",
     "start_url": "./index.html",
     "display": "standalone",
-    "background_color": "#0A3D5C",
-    "theme_color": "#0A3D5C",
+    "background_color": "#1B2068",
+    "theme_color": "#1B2068",
     "orientation": "portrait-primary",
     "icons": [
         {

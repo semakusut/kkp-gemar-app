@@ -1,35 +1,53 @@
 /* ============================================================
-   GEMAR-KKP — Design Tokens & Global Styles
+   GEMAR-KKP — Design Tokens & Global Styles  v4.2
    Gerakan Mandiri Hemat Energi · Kementerian Kelautan dan Perikanan
    ============================================================ */
 
 :root {
-    --ink-900: #0A2A3D;
-    --ink-800: #0A3D5C;
-    --ink-600: #0E5575;
-    --ink-500: #0F6980;
+    /* ── Ocean Blue Palette ───────────────────────────── */
+    --ocean:      #3535EE;   /* electric blue — CTA, active, highlight */
+    --ocean-dark: #2929CC;   /* hover state for electric blue */
+    --navy:       #1B2068;   /* deep navy — header, featured elements */
+    --navy-mid:   #252A90;   /* mid navy — hover, gradient stop */
+    --navy-deep:  #0D0F22;   /* very dark navy — footer, heavy contrast */
+
+    /* ── Backwards-compat ink aliases ────────────────── */
+    --ink-900: #0D0F22;
+    --ink-800: #1B2068;
+    --ink-600: #252A90;
+    --ink-500: #3535EE;
+
+    /* ── Green / Teal accents (KKP identity) ─────────── */
     --teal-400: #2D9E7C;
     --teal-300: #34B890;
     --teal-200: #4ACFA6;
-    --leaf: #2D9E3C;
-    --leaf-light: #6BCF7F;
-    --sun: #F4B400;
-    --sun-light: #FFE066;
-    --cream: #FFF9E5;
-    --paper: #FBF9F4;
-    --paper-dark: #F2EEE5;
-    --border: rgba(10, 42, 61, 0.08);
-    --text-muted: #5A7A8A;
-    --font: 'Poppins', system-ui, sans-serif;
+    --leaf:      #2D9E3C;
+    --leaf-light:#6BCF7F;
 
-    /* Alias — dipakai di halaman-halaman form */
+    /* ── Energy / Sun accents ─────────────────────────── */
+    --sun:       #F4B400;
+    --sun-light: #FFE066;
+
+    /* ── Surfaces & backgrounds ───────────────────────── */
+    --paper:      #FFFFFF;        /* main page background */
+    --paper-dark: #F0F2FF;        /* subtle blue-tinted surface */
+    --cream:      #F8F9FF;        /* soft section background */
+
+    /* ── Text & borders ───────────────────────────────── */
+    --text-muted:  #5A6480;
+    --border:      rgba(27, 32, 104, 0.10);
+
+    /* ── Page aliases (used in inline styles across pages) */
     --radius-lg:    16px;
     --radius-md:    10px;
     --radius-sm:    6px;
-    --border-color: rgba(10, 42, 61, 0.08);
-    --text-main:    #0A2A3D;
-    --surface-main: #FBF9F4;
-    --primary-main: #0A3D5C;
+    --border-color: rgba(27, 32, 104, 0.10);
+    --text-main:    #0D0F22;
+    --surface-main: #F0F2FF;
+    --primary-main: #1B2068;
+
+    /* ── Typography ───────────────────────────────────── */
+    --font: 'Poppins', system-ui, sans-serif;
 }
 
 * {
@@ -48,7 +66,9 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* ============ PAGE LAYOUT ============ */
+/* ============================================================
+   PAGE LAYOUT (login split view)
+   ============================================================ */
 .page {
     min-height: 100vh;
     display: grid;
@@ -59,17 +79,18 @@ body {
     .page {
         grid-template-columns: 1fr;
     }
-
     .page__visual--desktop {
         display: none;
     }
 }
 
-/* ============ LEFT: VISUAL PANEL ============ */
+/* ============================================================
+   LEFT VISUAL PANEL (login page)
+   ============================================================ */
 .page__visual,
 .page__visual--desktop {
     position: relative;
-    background: linear-gradient(160deg, #0A3D5C 0%, #0E5575 45%, #0F6980 100%);
+    background: linear-gradient(160deg, var(--navy-deep) 0%, var(--navy) 50%, var(--ocean) 100%);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -83,7 +104,7 @@ body {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     opacity: 0.4;
     mix-blend-mode: overlay;
     pointer-events: none;
@@ -96,14 +117,14 @@ body {
     right: -5%;
     width: 320px;
     height: 320px;
-    background: radial-gradient(circle, rgba(244, 180, 0, 0.35) 0%, rgba(244, 180, 0, 0.15) 40%, rgba(244, 180, 0, 0) 70%);
+    background: radial-gradient(circle, rgba(244, 180, 0, 0.30) 0%, rgba(244, 180, 0, 0.12) 40%, rgba(244, 180, 0, 0) 70%);
     filter: blur(20px);
     animation: sun-pulse 8s ease-in-out infinite;
 }
 
 @keyframes sun-pulse {
     0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.08); opacity: 0.85; }
+    50%       { transform: scale(1.08); opacity: 0.8; }
 }
 
 /* Wave layers at bottom */
@@ -123,9 +144,9 @@ body {
     width: 110%;
 }
 
-.wave--back  { bottom: 0; height: 90%; opacity: 0.35; }
-.wave--mid   { bottom: 0; height: 75%; opacity: 0.55; }
-.wave--front { bottom: 0; height: 55%; opacity: 1; }
+.wave--back  { bottom: 0; height: 90%; opacity: 0.18; }
+.wave--mid   { bottom: 0; height: 75%; opacity: 0.30; }
+.wave--front { bottom: 0; height: 55%; opacity: 0.50; }
 
 .wave svg {
     width: 100%;
@@ -139,7 +160,7 @@ body {
 
 @keyframes wave-slow {
     0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(-30px); }
+    50%       { transform: translateX(-30px); }
 }
 
 /* Visual content above waves */
@@ -154,7 +175,7 @@ body {
 .visual__logo {
     width: 52px;
     height: 52px;
-    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.25));
 }
 
 .visual__brand {
@@ -171,7 +192,7 @@ body {
     font-weight: 400;
     font-size: 10px;
     letter-spacing: 2px;
-    opacity: 0.7;
+    opacity: 0.65;
     margin-top: 5px;
     text-transform: uppercase;
 }
@@ -187,9 +208,9 @@ body {
     align-items: center;
     gap: 8px;
     padding: 6px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.20);
     border-radius: 100px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(8px);
     font-size: 11px;
     letter-spacing: 2.5px;
@@ -225,7 +246,7 @@ body {
 .visual__subtitle {
     font-size: 15px;
     line-height: 1.7;
-    opacity: 0.8;
+    opacity: 0.75;
     max-width: 420px;
     font-weight: 400;
 }
@@ -253,7 +274,7 @@ body {
     font-size: 11px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    opacity: 0.65;
+    opacity: 0.60;
     margin-top: 6px;
     font-weight: 500;
 }
@@ -261,7 +282,7 @@ body {
 /* Floating decorative element */
 .floater {
     position: absolute;
-    opacity: 0.1;
+    opacity: 0.07;
     z-index: 1;
 }
 
@@ -273,7 +294,9 @@ body {
     color: white;
 }
 
-/* ============ RIGHT: FORM PANEL ============ */
+/* ============================================================
+   RIGHT FORM PANEL (login page)
+   ============================================================ */
 .page__form {
     position: relative;
     display: flex;
@@ -283,13 +306,13 @@ body {
     background: var(--paper);
 }
 
-/* Paper grain on right panel */
+/* Subtle paper grain */
 .page__form::before {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.04 0 0 0 0 0.16 0 0 0 0 0.24 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.6;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.13 0 0 0 0 0.13 0 0 0 0 0.56 0 0 0 0.03 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.5;
     pointer-events: none;
 }
 
@@ -316,21 +339,16 @@ body {
     opacity: 0.4;
 }
 
-/* Mobile-only logo (shown when left panel is hidden) */
+/* Mobile-only logo */
 .form__mobile-logo {
     display: none;
     margin-bottom: 36px;
 }
 
-.form__mobile-logo img {
-    height: 52px;
-    width: auto;
-}
+.form__mobile-logo img { height: 52px; width: auto; }
 
 @media (max-width: 960px) {
-    .form__mobile-logo {
-        display: block;
-    }
+    .form__mobile-logo { display: block; }
 }
 
 .form {
@@ -346,7 +364,7 @@ body {
     letter-spacing: 3px;
     text-transform: uppercase;
     font-weight: 600;
-    color: var(--teal-400);
+    color: var(--ocean);
     margin-bottom: 16px;
     display: flex;
     align-items: center;
@@ -357,7 +375,7 @@ body {
     content: '';
     width: 24px;
     height: 2px;
-    background: var(--teal-400);
+    background: var(--ocean);
 }
 
 .form__title {
@@ -366,13 +384,13 @@ body {
     line-height: 1.05;
     letter-spacing: -1.5px;
     font-weight: 700;
-    color: var(--ink-900);
+    color: var(--navy-deep);
     margin-bottom: 12px;
 }
 
 .form__title em {
     font-style: italic;
-    color: var(--teal-400);
+    color: var(--ocean);
     font-weight: 600;
 }
 
@@ -384,7 +402,9 @@ body {
     font-weight: 400;
 }
 
-/* ============ FORM FIELDS ============ */
+/* ============================================================
+   FORM FIELDS
+   ============================================================ */
 .field {
     margin-bottom: 18px;
 }
@@ -393,7 +413,7 @@ body {
     display: block;
     font-size: 11px;
     font-weight: 600;
-    color: var(--ink-800);
+    color: var(--navy);
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 1.5px;
@@ -404,7 +424,7 @@ body {
     padding: 14px 18px 14px 46px;
     font-family: var(--font);
     font-size: 14.5px;
-    color: var(--ink-900);
+    color: var(--navy-deep);
     background: #fff;
     border: 1.5px solid var(--border);
     border-radius: 12px;
@@ -412,18 +432,14 @@ body {
     transition: all 0.2s ease;
 }
 
-.field__input::placeholder {
-    color: #A0AEB8;
-}
+.field__input::placeholder { color: #A8B4C8; }
 
 .field__input:focus {
-    border-color: var(--teal-400);
-    box-shadow: 0 0 0 4px rgba(45, 158, 124, 0.1);
+    border-color: var(--ocean);
+    box-shadow: 0 0 0 4px rgba(53, 53, 238, 0.10);
 }
 
-.field__wrap {
-    position: relative;
-}
+.field__wrap { position: relative; }
 
 .field__icon {
     position: absolute;
@@ -437,9 +453,7 @@ body {
     transition: color 0.2s;
 }
 
-.field__wrap:focus-within .field__icon {
-    color: var(--teal-400);
-}
+.field__wrap:focus-within .field__icon { color: var(--ocean); }
 
 /* Password toggle */
 .field__toggle {
@@ -460,11 +474,11 @@ body {
 }
 
 .field__toggle:hover {
-    color: var(--ink-800);
-    background: rgba(10, 42, 61, 0.05);
+    color: var(--navy);
+    background: rgba(27, 32, 104, 0.06);
 }
 
-/* Row: remember + forgot */
+/* Remember + forgot row */
 .form__row {
     display: flex;
     align-items: center;
@@ -478,19 +492,17 @@ body {
     gap: 10px;
     cursor: pointer;
     font-size: 13.5px;
-    color: var(--ink-800);
+    color: var(--navy);
     user-select: none;
 }
 
-.checkbox input {
-    display: none;
-}
+.checkbox input { display: none; }
 
 .checkbox__box {
     width: 18px;
     height: 18px;
     border-radius: 5px;
-    border: 1.5px solid rgba(10, 42, 61, 0.25);
+    border: 1.5px solid rgba(27, 32, 104, 0.22);
     background: #fff;
     display: flex;
     align-items: center;
@@ -500,8 +512,8 @@ body {
 }
 
 .checkbox input:checked + .checkbox__box {
-    background: var(--teal-400);
-    border-color: var(--teal-400);
+    background: var(--ocean);
+    border-color: var(--ocean);
 }
 
 .checkbox input:checked + .checkbox__box::after {
@@ -515,17 +527,17 @@ body {
 
 .form__forgot {
     font-size: 13px;
-    color: var(--teal-400);
+    color: var(--ocean);
     text-decoration: none;
     font-weight: 600;
     transition: color 0.15s;
 }
 
-.form__forgot:hover {
-    color: var(--ink-800);
-}
+.form__forgot:hover { color: var(--navy); }
 
-/* ============ BUTTONS ============ */
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 .btn {
     width: 100%;
     padding: 16px 24px;
@@ -534,7 +546,7 @@ body {
     font-weight: 600;
     letter-spacing: 0.3px;
     color: white;
-    background: linear-gradient(135deg, var(--ink-800) 0%, var(--ink-600) 100%);
+    background: linear-gradient(135deg, var(--navy) 0%, var(--ocean) 100%);
     border: none;
     border-radius: 12px;
     cursor: pointer;
@@ -543,7 +555,7 @@ body {
     justify-content: center;
     gap: 10px;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 14px rgba(10, 61, 92, 0.25);
+    box-shadow: 0 4px 16px rgba(53, 53, 238, 0.30);
     position: relative;
     overflow: hidden;
 }
@@ -561,26 +573,19 @@ body {
 
 .btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(10, 61, 92, 0.35);
+    box-shadow: 0 6px 24px rgba(53, 53, 238, 0.40);
 }
 
-.btn:hover::before {
-    left: 100%;
-}
+.btn:hover::before { left: 100%; }
 
-.btn:active {
-    transform: translateY(0);
-}
+.btn:active { transform: translateY(0); }
 
-.btn__arrow {
-    transition: transform 0.2s;
-}
+.btn__arrow { transition: transform 0.2s; }
+.btn:hover .btn__arrow { transform: translateX(4px); }
 
-.btn:hover .btn__arrow {
-    transform: translateX(4px);
-}
-
-/* ============ FOOTER ============ */
+/* ============================================================
+   FOOTER
+   ============================================================ */
 .form__footer {
     margin-top: 32px;
     padding-top: 24px;
@@ -591,22 +596,19 @@ body {
     line-height: 1.7;
 }
 
-.form__footer strong {
-    color: var(--ink-800);
-    font-weight: 600;
-}
+.form__footer strong { color: var(--navy); font-weight: 600; }
 
 .form__footer a {
-    color: var(--teal-400);
+    color: var(--ocean);
     text-decoration: none;
     font-weight: 600;
 }
 
-.form__footer a:hover {
-    text-decoration: underline;
-}
+.form__footer a:hover { text-decoration: underline; }
 
-/* ============ ENTRY ANIMATIONS ============ */
+/* ============================================================
+   ENTRY ANIMATIONS
+   ============================================================ */
 .anim-1 { animation: fadeUp 0.7s ease 0.1s both; }
 .anim-2 { animation: fadeUp 0.7s ease 0.2s both; }
 .anim-3 { animation: fadeUp 0.7s ease 0.3s both; }
@@ -621,7 +623,9 @@ body {
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ============ ERROR STATES ============ */
+/* ============================================================
+   ERROR / SUCCESS STATES
+   ============================================================ */
 .form__error {
     display: none;
     padding: 14px 18px;
@@ -642,8 +646,8 @@ body {
 
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-4px); }
-    40%, 80% { transform: translateX(4px); }
+    20%, 60%  { transform: translateX(-4px); }
+    40%, 80%  { transform: translateX(4px); }
 }
 
 .field__input--error {
@@ -656,7 +660,22 @@ body {
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
 }
 
-/* ============ BUTTON LOADING ============ */
+.form__success {
+    display: block;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+    border: 1px solid #BBF7D0;
+    border-left: 4px solid #16A34A;
+    border-radius: 8px;
+    color: #166534;
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   BUTTON LOADING STATE
+   ============================================================ */
 .btn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
@@ -675,20 +694,4 @@ body {
     vertical-align: middle;
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* ============ SUCCESS STATE ============ */
-.form__success {
-    display: block;
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
-    border: 1px solid #BBF7D0;
-    border-left: 4px solid #16A34A;
-    border-radius: 8px;
-    color: #166534;
-    font-size: 13.5px;
-    line-height: 1.5;
-}
+@keyframes spin { to { transform: rotate(360deg); } }

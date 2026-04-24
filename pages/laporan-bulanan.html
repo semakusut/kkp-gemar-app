@@ -3,16 +3,21 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0A3D5C" />
+    <meta name="theme-color" content="#1B2068" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="GEMAR-KKP" />
+    <link rel="apple-touch-icon" href="../assets/img/logo.svg" />
     <title>GEMAR-KKP · Laporan Bulanan</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="assets/css/gemar-style.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
+    <link rel="stylesheet" href="../assets/css/gemar-style.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
+    <script src="../assets/js/loader.js"></script>
     <style>
         .form-container {
             max-width: 800px;
@@ -60,7 +65,7 @@
             font-weight: 500;
             color: var(--text-muted);
         }
-        .field__input, .field__select {
+        .field__input, .field__select, .field__textarea {
             padding: 0.75rem 1rem;
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
@@ -69,7 +74,11 @@
             transition: all 0.2s;
             background: var(--surface-main);
         }
-        .field__input:focus, .field__select:focus {
+        .field__textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .field__input:focus, .field__select:focus, .field__textarea:focus {
             outline: none;
             border-color: var(--primary-main);
             box-shadow: 0 0 0 3px rgba(10, 61, 92, 0.1);
@@ -142,7 +151,7 @@
     <div class="dashboard">
         <header class="header">
             <div class="header__brand">
-                <img src="assets/img/logo.svg" class="header__logo" alt="GEMAR-KKP">
+                <img src="../assets/img/logo.svg" class="header__logo" alt="GEMAR-KKP">
                 <span class="header__title">GEMAR-KKP</span>
             </div>
             <nav class="header__nav">
@@ -242,6 +251,18 @@
                         </div>
                     </div>
 
+                    <div class="form-section">
+                        <h2 class="form-section__title">📋 Upaya Penghematan & Kendala</h2>
+                        <div class="field">
+                            <label class="field__label" for="upaya_penghematan">Upaya Penghematan yang Dilakukan</label>
+                            <textarea id="upaya_penghematan" class="field__input" rows="3" placeholder="cth: Mematikan AC & lampu saat tidak digunakan, menggunakan lampu LED"></textarea>
+                        </div>
+                        <div class="field">
+                            <label class="field__label" for="kendala">Kendala yang Dihadapi</label>
+                            <textarea id="kendala" class="field__input" rows="3" placeholder="cth: Gedung tua dengan sistem kelistrikan yang tidak efisien"></textarea>
+                        </div>
+                    </div>
+
                     <div id="form-error" class="form__error"></div>
                     <div id="form-success" class="form__success"></div>
 
@@ -266,15 +287,67 @@
         </main>
     </div>
 
-    <script src="assets/js/auth.js"></script>
+    <script src="../assets/js/auth.js"></script>
     <script>
         const user = requireAuth();
         if (!user) throw new Error('redirect to login');
 
-        // Set default date
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get('edit');
+        const isEditMode = !!editId;
+
+        if (isEditMode) {
+            document.querySelector('.welcome__title').textContent = 'Edit Laporan Bulanan';
+            document.querySelector('.welcome__subtitle').textContent = 'Perbarui data laporan';
+            document.getElementById('btn-submit').innerHTML = 'Simpan Perubahan';
+            loadLaporanForEdit(editId);
+        }
+
         const now = new Date();
-        document.getElementById('bulan').value = now.getMonth();
-        document.getElementById('tahun').value = now.getFullYear();
+        if (!isEditMode) {
+            document.getElementById('bulan').value = now.getMonth();
+            document.getElementById('tahun').value = now.getFullYear();
+        }
+
+        function loadLaporanForEdit(reportId) {
+            PageLoader.start('Memuat data laporan untuk diedit...');
+            fetch(AUTH_CONFIG.apiUrl, {
+                method: 'POST',
+                body: new URLSearchParams({
+                    action: 'report.monthly.get',
+                    token: getToken(),
+                    report_id: reportId
+                })
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (!result.success) {
+                    PageLoader.error(
+                        'Gagal memuat laporan: ' + result.error,
+                        () => loadLaporanForEdit(reportId)
+                    );
+                    return;
+                }
+                const r = result.data.report;
+                document.getElementById('bulan').value = parseInt(r.bulan) - 1;
+                document.getElementById('tahun').value = r.tahun;
+                document.getElementById('listrik_kwh').value = r.listrik_kwh || '';
+                document.getElementById('listrik_harga').value = r.listrik_harga || '';
+                document.getElementById('air_kubik').value = r.air_kubik || '';
+                document.getElementById('air_harga').value = r.air_harga || '';
+                document.getElementById('telepon_jam').value = r.telepon_jam || '';
+                document.getElementById('telepon_harga').value = r.telepon_harga || '';
+                document.getElementById('upaya_penghematan').value = r.upaya_penghematan || '';
+                document.getElementById('kendala').value = r.kendala || '';
+                PageLoader.finish();
+            })
+            .catch(err => {
+                PageLoader.error(
+                    'Koneksi gagal saat memuat data laporan. (' + err.message + ')',
+                    () => loadLaporanForEdit(reportId)
+                );
+            });
+        }
 
         function showError(msg) {
             const err = document.getElementById('form-error');
@@ -381,8 +454,9 @@
                 progFill.style.width = '90%';
 
                 const p = {
-                    action: 'report.monthly.create',
+                    action: isEditMode ? 'report.monthly.update' : 'report.monthly.create',
                     token: getToken(),
+                    report_id: editId || undefined,
                     bulan: bulan,
                     tahun: tahun,
                     listrik_kwh: document.getElementById('listrik_kwh').value,
@@ -393,11 +467,15 @@
                     air_bukti_url: urlAir,
                     telepon_jam: document.getElementById('telepon_jam').value,
                     telepon_harga: document.getElementById('telepon_harga').value,
-                    telepon_bukti_url: urlTelepon
+                    telepon_bukti_url: urlTelepon,
+                    upaya_penghematan: document.getElementById('upaya_penghematan').value,
+                    kendala: document.getElementById('kendala').value
                 };
 
                 const body = new URLSearchParams();
-                for (const key in p) body.append(key, p[key]);
+                for (const key in p) {
+                    if (p[key] !== undefined) body.append(key, p[key]);
+                }
 
                 const res = await fetch(AUTH_CONFIG.apiUrl, { method: 'POST', body: body });
                 if (!res.ok) throw new Error('Koneksi terputus (HTTP ' + res.status + ')');
@@ -406,11 +484,16 @@
                 if (result.success) {
                     progFill.style.width = '100%';
                     progText.textContent = "Berhasil disimpan!";
-                    showSuccess(result.message || "Laporan bulanan dan data dukung berhasil disimpan!");
-                    document.getElementById('monthlyForm').reset();
-                    document.getElementById('bulan').value = now.getMonth();
-                    document.getElementById('tahun').value = now.getFullYear();
-                    setTimeout(() => progContainer.style.display = 'none', 4000);
+                    showSuccess(result.message || "Laporan berhasil disimpan!");
+                    if (!isEditMode) {
+                        document.getElementById('monthlyForm').reset();
+                        document.getElementById('bulan').value = now.getMonth();
+                        document.getElementById('tahun').value = now.getFullYear();
+                    }
+                    setTimeout(() => {
+                        progContainer.style.display = 'none';
+                        if (isEditMode) window.location.href = 'dashboard.html';
+                    }, 2000);
                 } else {
                     throw new Error(result.error || "Gagal menyimpan laporan.");
                 }

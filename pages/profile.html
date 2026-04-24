@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1B2068" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="GEMAR-KKP" />
+    <link rel="apple-touch-icon" href="../assets/img/logo.svg" />
+    <title>GEMAR-KKP · Profil</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../assets/css/gemar-style.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
+
+    <style>
+        .container { max-width: 600px; margin: 0 auto; padding: 2rem 1.5rem; }
+        
+        .page-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 1.5rem; }
+        
+        .card {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-main); }
+        
+        .profile-row {
+            display: flex;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .profile-row:last-child { border-bottom: none; }
+        .profile-label { width: 120px; color: var(--text-muted); font-size: 0.875rem; }
+        .profile-value { flex: 1; font-weight: 500; }
+        
+        .field { margin-bottom: 1rem; }
+        .field label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.375rem; }
+        .field input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 0.9375rem;
+        }
+        .field input:focus { outline: none; border-color: var(--primary-main); box-shadow: 0 0 0 3px rgba(10,61,92,0.1); }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s;
+        }
+        .btn--primary { background: var(--primary-main); color: #fff; }
+        .btn--primary:hover { background: var(--primary-dark); }
+        
+        .msg { padding: 0.75rem 1rem; border-radius: var(--radius-md); margin-bottom: 1rem; font-size: 0.875rem; }
+        .msg--success { background: #D1FAE5; color: #065F46; }
+        .msg--error { background: #FEE2E2; color: #991B1B; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <header class="header">
+            <div class="header__brand">
+                <img src="../assets/img/logo.svg" class="header__logo" alt="GEMAR-KKP">
+                <span class="header__title">GEMAR-KKP</span>
+            </div>
+            <nav class="header__nav">
+                <a href="dashboard.html" class="header__link">Dashboard</a>
+                <a href="list-laporan.html" class="header__link">List Laporan</a>
+                <button class="header__btn header__btn--logout" onclick="handleLogout()">Logout</button>
+            </nav>
+        </header>
+
+        <main class="main">
+            <div class="container">
+                <h1 class="page-title">Profil Saya</h1>
+                
+                <div class="card">
+                    <h2 class="card-title">Informasi Akun</h2>
+                    <div class="profile-row">
+                        <span class="profile-label">Nama</span>
+                        <span class="profile-value" id="userName">-</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-label">Email</span>
+                        <span class="profile-value" id="userEmail">-</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-label">Role</span>
+                        <span class="profile-value" id="userRole">-</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-label">Unit Kerja</span>
+                        <span class="profile-value" id="userUpt">-</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Ubah Password</h2>
+                    <div id="msgBox"></div>
+                    
+                    <div class="field">
+                        <label>Password Lama</label>
+                        <input type="password" id="oldPassword" placeholder="Masukkan password lama">
+                    </div>
+                    <div class="field">
+                        <label>Password Baru</label>
+                        <input type="password" id="newPassword" placeholder="Masukkan password baru (min 6 karakter)">
+                    </div>
+                    <div class="field">
+                        <label>Konfirmasi Password Baru</label>
+                        <input type="password" id="confirmPassword" placeholder="Masukkan password baru lagi">
+                    </div>
+                    
+                    <button class="btn btn--primary" onclick="changePassword()">Simpan Password</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/js/auth.js"></script>
+    <script>
+        const user = requireAuth();
+        if (!user) throw new Error('redirect to login');
+
+        const roleLabels = {
+            'upt_admin': 'Admin UPT',
+            'eselon1': 'Sekretaris Ditjen/Badan',
+            'superadmin': 'Sekretaris Jenderal'
+        };
+
+        document.getElementById('userName').textContent = user.name || '-';
+        document.getElementById('userEmail').textContent = user.email || '-';
+        document.getElementById('userRole').textContent = roleLabels[user.role] || user.role;
+        document.getElementById('userUpt').textContent = user.uptId || '-';
+
+        function showMsg(text, type) {
+            const el = document.getElementById('msgBox');
+            el.innerHTML = '<div class="msg msg--' + type + '">' + text + '</div>';
+        }
+
+        function changePassword() {
+            const oldPwd = document.getElementById('oldPassword').value;
+            const newPwd = document.getElementById('newPassword').value;
+            const confirmPwd = document.getElementById('confirmPassword').value;
+
+            if (!oldPwd || !newPwd || !confirmPwd) {
+                return showMsg('Semua field wajib diisi', 'error');
+            }
+            if (newPwd.length < 6) {
+                return showMsg('Password baru minimal 6 karakter', 'error');
+            }
+            if (newPwd !== confirmPwd) {
+                return showMsg('Password baru tidak cocok', 'error');
+            }
+
+            fetch(AUTH_CONFIG.apiUrl, {
+                method: 'POST',
+                body: new URLSearchParams({
+                    action: 'auth.changePassword',
+                    token: getToken(),
+                    oldPassword: oldPwd,
+                    newPassword: newPwd
+                })
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    showMsg('Password berhasil diubah', 'success');
+                    document.getElementById('oldPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    showMsg(res.error || 'Gagal mengubah password', 'error');
+                }
+            })
+            .catch(err => showMsg('Error: ' + err.message, 'error'));
+        }
+    </script>
+</body>
+</html>

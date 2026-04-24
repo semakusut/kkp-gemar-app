@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1B2068" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="GEMAR-KKP" />
+    <link rel="apple-touch-icon" href="../assets/img/logo.svg" />
+    <title>GEMAR-KKP · Preview Laporan</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../assets/css/gemar-style.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
+    <script src="../assets/js/loader.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root { --primary: #1B2068; }
+
+        /* ── Toolbar ─────────────────────────────────────────── */
+        .preview-toolbar {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            padding: 8px 16px;
+            border-bottom: 1px solid rgba(27,32,104,0.10);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            z-index: 100;
+            box-shadow: 0 1px 8px rgba(13,15,34,0.08);
+        }
+
+        .toolbar-left { display: flex; align-items: center; }
+        .toolbar-right { display: flex; align-items: center; gap: 8px; }
+
+        /* Reset/override .btn for toolbar context */
+        .preview-toolbar .btn {
+            all: unset;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-family: 'Poppins', system-ui, sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+            min-height: 36px;
+        }
+
+        .btn-back {
+            color: #5A6480;
+            border: 1px solid rgba(27,32,104,0.12);
+        }
+        .btn-back:hover { background: #F0F2FF; color: #1B2068; border-color: rgba(27,32,104,0.25); }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #1B2068, #3535EE);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(53,53,238,0.25);
+        }
+        .btn-pdf:hover { box-shadow: 0 3px 12px rgba(53,53,238,0.38); transform: translateY(-1px); }
+
+        .btn-print {
+            color: #1B2068;
+            border: 1px solid rgba(27,32,104,0.20);
+            background: #F0F2FF;
+        }
+        .btn-print:hover { background: #E2E5FF; }
+
+        /* Toolbar progress bar */
+        .toolbar-progress {
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .toolbar-progress.visible { display: flex; }
+        .toolbar-progress__track {
+            width: 120px;
+            height: 4px;
+            background: #E2E5FF;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .toolbar-progress__fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #1B2068, #3535EE);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        .toolbar-progress__label {
+            font-size: 11px;
+            color: #5A6480;
+            font-family: 'Poppins', system-ui, sans-serif;
+            white-space: nowrap;
+        }
+
+        /* Hide print on mobile — users can't print from phone */
+        @media (max-width: 600px) {
+            .btn-print { display: none; }
+            .preview-toolbar .btn { padding: 7px 12px; font-size: 12px; }
+            .toolbar-progress__label { display: none; }
+            .toolbar-progress__track { width: 70px; }
+        }
+
+        .preview-container {
+            max-width: 21cm;
+            margin: 0 auto;
+            background: #fff;
+            padding: 1.5cm 1cm;
+        }
+
+        /* Page 1 */
+        .page-1 {
+            min-height: 23cm;
+        }
+
+        .kop {
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #000;
+            margin-bottom: 20px;
+        }
+
+        .kop__title {
+            font-family: 'Times New Roman', serif;
+            font-size: 14pt;
+            font-weight: 700;
+        }
+
+        .kop__subtitle {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            font-weight: 400;
+        }
+
+        .kop__gemar {
+            font-family: 'Times New Roman', serif;
+            font-size: 18pt;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+
+        .header-info {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+            font-family: 'Times New Roman', serif;
+            font-size: 11pt;
+        }
+
+        .header-info__row { display: table-row; }
+        .header-info__label { display: table-cell; width: 120px; padding: 4px 0; }
+        .header-info__value { display: table-cell; font-weight: 700; }
+
+        .section-title {
+            font-family: 'Times New Roman', serif;
+            font-size: 11pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin: 15px 0 8px;
+            padding-left: 0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Times New Roman', serif;
+            font-size: 10pt;
+            margin-bottom: 10px;
+        }
+
+        .data-table th, .data-table td {
+            padding: 5px 8px;
+            border: 1px solid #000;
+            text-align: left;
+        }
+
+        .data-table th {
+            background: #e8e8e8;
+            font-weight: 700;
+        }
+
+        .data-table .number { text-align: right; }
+        .data-table .text-right { text-align: right; font-weight: 700; }
+
+        .text-box {
+            font-family: 'Times New Roman', serif;
+            font-size: 10pt;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            min-height: 50px;
+        }
+
+        .ttd-section {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .ttd-box {
+            width: 220px;
+            text-align: center;
+            font-family: 'Times New Roman', serif;
+            font-size: 10pt;
+        }
+
+        .ttd-box__label { margin-bottom: 50px; }
+        .ttd-box__signature { height: 45px; border-bottom: 1px solid #000; margin-bottom: 5px; }
+        .ttd-box__name { font-weight: 700; text-decoration: underline; }
+        .ttd-box__nip { }
+
+        .print-date {
+            margin-top: 40px;
+            font-family: 'Times New Roman', serif;
+            font-size: 9pt;
+            text-align: right;
+            color: #666;
+        }
+
+        /* Page 2 */
+        .page-2 {
+            page-break-before: always;
+            min-height: 23cm;
+            padding-top: 1cm;
+        }
+
+        .page-2__title {
+            font-family: 'Times New Roman', serif;
+            font-size: 14pt;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .bukti-section {
+            margin-bottom: 25px;
+        }
+
+        .bukti-section__title {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            font-weight: 700;
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .bukti-section__content { }
+
+        .bukti-card {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .bukti-card__label {
+            font-family: 'Times New Roman', serif;
+            font-size: 9pt;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--primary);
+        }
+
+        /* Embedded image */
+        .bukti-card__img {
+            display: block;
+            width: 100%;
+            max-height: 320px;
+            object-fit: contain;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+        }
+
+        /* Embedded PDF via Google Drive preview */
+        .bukti-card__iframe {
+            display: block;
+            width: 100%;
+            height: 380px;
+            border: 1px solid #ddd;
+            background: #f5f5f5;
+        }
+
+        .bukti-card__link {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f0f0f0;
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 8pt;
+            margin-top: 6px;
+            border: 1px solid #ddd;
+        }
+        .bukti-card__link:hover { background: #e0e0e0; }
+
+        .no-bukti {
+            font-family: 'Times New Roman', serif;
+            font-size: 10pt;
+            color: #999;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+            background: #f9f9f9;
+            border: 1px dashed #ccc;
+        }
+
+        /* ── Mobile responsive ───────────────────────────────── */
+        @media (max-width: 768px) {
+            .preview-container {
+                max-width: 100%;
+                padding: 16px 12px;
+                margin: 0;
+            }
+            .kop__title  { font-size: 11pt; }
+            .kop__gemar  { font-size: 14pt; letter-spacing: 1px; }
+            .bukti-section__content {
+                grid-template-columns: 1fr;
+            }
+            .ttd-section { justify-content: center; }
+        }
+
+        @media print {
+            .preview-toolbar { display: none !important; }
+            .preview-container { margin: 0; padding: 0.5cm; }
+            body { background: #fff; }
+            .page-2 { page-break-before: always; }
+            @page { margin: 0.5cm; size: A4 portrait; }
+
+            .bukti-card { page-break-inside: avoid; margin-bottom: 12px; }
+            .bukti-card__img { max-height: none; width: 100%; }
+            .bukti-card__iframe { height: 480px; }
+            .bukti-card__link { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-toolbar">
+        <div class="toolbar-left">
+            <button class="btn btn-back" onclick="window.history.back()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <path d="M19 12H5M12 5l-7 7 7 7"/>
+                </svg>
+                Kembali
+            </button>
+        </div>
+        <div class="toolbar-right">
+            <div class="toolbar-progress" id="toolbarProgress">
+                <div class="toolbar-progress__track">
+                    <div class="toolbar-progress__fill" id="toolbarProgressFill"></div>
+                </div>
+                <span class="toolbar-progress__label" id="toolbarProgressLabel"></span>
+            </div>
+            <button class="btn btn-print" id="btnPrint" onclick="handlePrint()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <polyline points="6 9 6 2 18 2 18 9"/>
+                    <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+                    <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                Print
+            </button>
+            <button class="btn btn-pdf" id="btnPdf" onclick="downloadPDF()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Unduh PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="preview-container" id="laporan-content">
+        <!-- PAGE 1 -->
+        <div class="page-1">
+            <div class="kop">
+                <div class="kop__title">KEMENTERIAN KELAUTAN DAN PERIKANAN RI</div>
+                <div class="kop__gemar">GERAKAN MANDIRI HEMAT ENERGI (GEMAR)</div>
+            </div>
+
+            <div class="header-info">
+                <div class="header-info__row">
+                    <span class="header-info__label">Unit Kerja</span>
+                    <span class="header-info__value" id="upt-name">-</span>
+                </div>
+                <div class="header-info__row">
+                    <span class="header-info__label">Bulan / Tahun</span>
+                    <span class="header-info__value" id="bulan-tahun">-</span>
+                </div>
+            </div>
+
+            <h3 class="section-title">I. Pengeluaran Langganan dan Jasa</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width:30px">No</th>
+                        <th>Jenis Pengeluaran</th>
+                        <th style="width:80px">Pemakaian</th>
+                        <th style="width:50px">Satuan</th>
+                        <th style="width:100px">Biaya (Rp)</th>
+                    </tr>
+                </thead>
+                <tbody id="table-pengeluaran"></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="text-right">JUMLAH</td>
+                        <td class="number" id="total-pengeluaran">0</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <h3 class="section-title">II. Upaya Penghematan yang Dilakukan</h3>
+            <div class="text-box" id="upaya-penghematan">-</div>
+
+            <h3 class="section-title">III. Kendala yang Dihadapi</h3>
+            <div class="text-box" id="kendala-text">-</div>
+
+            <div class="ttd-section">
+                <div class="ttd-box">
+                    <div class="ttd-box__label">Pimpinan Unit Kerja</div>
+                    <div class="ttd-box__signature"></div>
+                    <div class="ttd-box__name" id="nama-pimpinan">-</div>
+                    <div class="ttd-box__nip" id="nip-pimpinan">NIP. -</div>
+                </div>
+            </div>
+
+            <div class="print-date">
+            </div>
+        </div>
+
+        <!-- PAGE 2 -->
+        <div class="page-2">
+            <div class="page-2__title">LAMPIRAN DATA DUKUNG</div>
+
+            <div class="bukti-section">
+                <div class="bukti-section__title">BUKTI LISTRIK</div>
+                <div class="bukti-section__content" id="bukti-listrik">
+                    <div class="no-bukti">Tidak ada bukti</div>
+                </div>
+            </div>
+
+            <div class="bukti-section">
+                <div class="bukti-section__title">BUKTI AIR</div>
+                <div class="bukti-section__content" id="bukti-air">
+                    <div class="no-bukti">Tidak ada bukti</div>
+                </div>
+            </div>
+
+            <div class="bukti-section">
+                <div class="bukti-section__title">BUKTI TELEPON</div>
+                <div class="bukti-section__content" id="bukti-telepon">
+                    <div class="no-bukti">Tidak ada bukti</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/auth.js"></script>
+    <script>
+        const user = requireAuth();
+        if (!user) throw new Error('redirect to login');
+
+        const NAMA_BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const params = new URLSearchParams(window.location.search);
+        const reportId = params.get('id');
+
+        function formatRupiah(num) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
+        }
+
+        function loadReportData() {
+            if (!reportId) {
+                PageLoader.error('ID laporan tidak ditemukan. Buka halaman ini dari daftar laporan.', null);
+                return;
+            }
+
+            PageLoader.start('Memuat data laporan...');
+
+            // Use dedicated single-report action — more efficient than fetching the full list
+            const fetchReport = fetch(AUTH_CONFIG.apiUrl, {
+                method: 'POST',
+                body: new URLSearchParams({ action: 'report.monthly.get', token: getToken(), report_id: reportId })
+            }).then(r => r.json());
+
+            // Try to resolve UPT ID → nama. Fails silently if upt_admin lacks permission.
+            // Long-term fix: add upt_nama field to report.monthly.get backend response.
+            const fetchUpt = fetch(AUTH_CONFIG.apiUrl, {
+                method: 'POST',
+                body: new URLSearchParams({ action: 'master.upt.list', token: getToken() })
+            }).then(r => r.json()).catch(() => ({}));
+
+            Promise.all([fetchReport, fetchUpt])
+            .then(([result, uptResult]) => {
+                if (!result.success) {
+                    PageLoader.error(result.error || 'Laporan tidak ditemukan.', null);
+                    return;
+                }
+
+                const report = result.data.report;
+                if (!report) {
+                    PageLoader.error('Data laporan kosong.', null);
+                    return;
+                }
+
+                // If backend already joins upt_nama, use it directly.
+                // Otherwise try to look up from master.upt.list (response: result.data.list).
+                if (!report.upt_nama) {
+                    const uptList = (uptResult.data && uptResult.data.list) || uptResult.list || [];
+                    const uptMap = {};
+                    uptList.forEach(u => { uptMap[String(u.kode).toUpperCase()] = u.nama; });
+                    const kode = String(report.upt_id || user.uptId || '').toUpperCase();
+                    report.upt_nama = uptMap[kode] || null;
+                }
+
+                renderReport(report);
+                PageLoader.finish();
+            })
+            .catch(err => {
+                PageLoader.error('Koneksi ke server gagal. (' + err.message + ')', loadReportData);
+            });
+        }
+
+        function renderReport(r) {
+            document.getElementById('upt-name').textContent = r.upt_nama || r.upt_id || user.uptId || '-';
+            document.getElementById('bulan-tahun').textContent = (NAMA_BULAN[parseInt(r.bulan) - 1] || r.bulan) + ' ' + r.tahun;
+            
+            const tbody = document.getElementById('table-pengeluaran');
+            const rows = [
+                { nama: 'Listrik', pakai: parseFloat(r.listrik_kwh) || 0, sat: 'kWh', harga: parseFloat(r.listrik_harga) || 0 },
+                { nama: 'Air', pakai: parseFloat(r.air_kubik) || 0, sat: 'm³', harga: parseFloat(r.air_harga) || 0 },
+                { nama: 'Telepon', pakai: parseFloat(r.telepon_jam) || 0, sat: 'Jam', harga: parseFloat(r.telepon_harga) || 0 }
+            ];
+
+            let html = '';
+            let total = 0;
+            rows.forEach((row, i) => {
+                total += row.harga;
+                html += `<tr>
+                    <td class="number">${i + 1}</td>
+                    <td>${row.nama}</td>
+                    <td class="number">${row.pakai.toLocaleString('id-ID')}</td>
+                    <td>${row.sat}</td>
+                    <td class="number">${formatRupiah(row.harga)}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+            document.getElementById('total-pengeluaran').textContent = formatRupiah(total);
+
+            document.getElementById('upaya-penghematan').textContent = r.upaya_penghematan || '-';
+            document.getElementById('kendala-text').textContent = r.kendala || '-';
+            document.getElementById('nama-pimpinan').textContent = r.nama_pimpinan || user.name || '-';
+            document.getElementById('nip-pimpinan').textContent = 'NIP. ' + (r.nip_pimpinan || '-');
+
+            // Bukti Page 2
+            renderBukti('bukti-listrik', r.listrik_bukti, 'Listrik');
+            renderBukti('bukti-air', r.air_bukti, 'Air');
+            renderBukti('bukti-telepon', r.telepon_bukti, 'Telepon');
+        }
+
+        function extractDriveId(url) {
+            if (!url) return null;
+            var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (m) return m[1];
+            m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+            if (m) return m[1];
+            return null;
+        }
+
+        // Called from onerror on <img> when Drive returns non-image (PDF, doc, etc.)
+        function switchBuktiToIframe(elemId, fileId) {
+            const img = document.getElementById('bimg-' + elemId);
+            if (!img) return;
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://drive.google.com/file/d/' + fileId + '/preview';
+            iframe.className = 'bukti-card__iframe';
+            iframe.frameBorder = '0';
+            iframe.allowFullscreen = true;
+            img.parentNode.replaceChild(iframe, img);
+        }
+
+        function renderBukti(elemId, url, label) {
+            const el = document.getElementById(elemId);
+            if (!url) {
+                el.innerHTML = '<div class="no-bukti">Tidak ada bukti upload</div>';
+                return;
+            }
+
+            const fileId = extractDriveId(url);
+            const driveLink = fileId
+                ? 'https://drive.google.com/file/d/' + fileId + '/view'
+                : url;
+
+            if (!fileId) {
+                el.innerHTML = `<div class="bukti-card">
+                    <div class="bukti-card__label">${label}</div>
+                    <div class="no-bukti">Format URL tidak dikenali</div>
+                    <a href="${driveLink}" target="_blank" class="bukti-card__link">Buka file ↗</a>
+                </div>`;
+                return;
+            }
+
+            // Use drive.usercontent.google.com (final destination after Drive redirect).
+            // No crossorigin attribute — lets browser display and print without CORS restrictions.
+            // onerror switches to iframe for non-image files (PDF, doc, etc.)
+            const imgSrc = 'https://drive.usercontent.google.com/download?id=' + fileId + '&export=view&authuser=0';
+
+            el.innerHTML = `<div class="bukti-card">
+                <div class="bukti-card__label">${label}</div>
+                <img
+                    id="bimg-${elemId}"
+                    src="${imgSrc}"
+                    class="bukti-card__img"
+                    alt="Bukti ${label}"
+                    onerror="switchBuktiToIframe('${elemId}', '${fileId}')"
+                />
+                <a href="${driveLink}" target="_blank" class="bukti-card__link">Buka di Google Drive ↗</a>
+            </div>`;
+        }
+
+        // ── Progress bar helpers ──────────────────────────────────
+        function showProgress(pct, label) {
+            document.getElementById('toolbarProgress').classList.add('visible');
+            document.getElementById('toolbarProgressFill').style.width = pct + '%';
+            document.getElementById('toolbarProgressLabel').textContent = label;
+        }
+        function hideProgress() {
+            document.getElementById('toolbarProgress').classList.remove('visible');
+            document.getElementById('toolbarProgressFill').style.width = '0%';
+        }
+
+        // Wait for all embedded bukti images to finish loading before print/PDF
+        function waitForImages() {
+            const imgs = Array.from(
+                document.querySelectorAll('#laporan-content img.bukti-card__img')
+            );
+            if (!imgs.length) return Promise.resolve();
+            return Promise.all(imgs.map(img => new Promise(resolve => {
+                if (img.complete && img.naturalWidth > 0) { resolve(); return; }
+                img.addEventListener('load',  resolve, { once: true });
+                img.addEventListener('error', resolve, { once: true }); // don't block on broken img
+            })));
+        }
+
+        // ── Print ─────────────────────────────────────────────────
+        async function handlePrint() {
+            const btn = document.getElementById('btnPrint');
+            btn.disabled = true;
+            showProgress(20, 'Menunggu gambar...');
+            await waitForImages();
+            showProgress(75, 'Menyiapkan halaman...');
+            await new Promise(r => setTimeout(r, 500)); // give browser time to render
+            showProgress(100, 'Membuka dialog...');
+            await new Promise(r => setTimeout(r, 150));
+            hideProgress();
+            btn.disabled = false;
+            window.print();
+        }
+
+        // ── Download PDF ──────────────────────────────────────────
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('laporan-content');
+            const btnPdf   = document.getElementById('btnPdf');
+            const btnPrint = document.getElementById('btnPrint');
+
+            btnPdf.disabled   = true;
+            btnPrint.disabled = true;
+
+            try {
+                showProgress(10, 'Menunggu gambar...');
+                await waitForImages();
+
+                showProgress(30, 'Merender halaman...');
+                await new Promise(r => setTimeout(r, 400));
+
+                showProgress(50, 'Mengambil snapshot...');
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,   // allow cross-origin images (Google Drive)
+                    logging: false,
+                    imageTimeout: 20000,
+                    scrollX: 0,
+                    scrollY: -window.scrollY, // capture from top of element
+                });
+
+                showProgress(80, 'Membuat PDF...');
+
+                const imgData = canvas.toDataURL('image/jpeg', 0.88);
+                const pdf  = new jsPDF('p', 'mm', 'A4');
+                const pdfW = pdf.internal.pageSize.getWidth();
+                const pdfH = pdf.internal.pageSize.getHeight();
+
+                // Total rendered height in mm
+                const imgH = (canvas.height * pdfW) / canvas.width;
+
+                // Split canvas across as many A4 pages as needed
+                let yRemain = imgH;
+                let yPos    = 0;
+                pdf.addImage(imgData, 'JPEG', 0, yPos, pdfW, imgH);
+                yRemain -= pdfH;
+                while (yRemain > 0) {
+                    yPos = yRemain - imgH;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, yPos, pdfW, imgH);
+                    yRemain -= pdfH;
+                }
+
+                showProgress(96, 'Menyimpan...');
+                const bulan = document.getElementById('bulan-tahun').textContent.trim().replace(/\s+/g, '_');
+                pdf.save('GEMAR-Laporan_' + bulan + '.pdf');
+
+                showProgress(100, 'Selesai!');
+                await new Promise(r => setTimeout(r, 900));
+
+            } catch (err) {
+                console.error('PDF Error:', err);
+                alert('Gagal membuat PDF: ' + err.message);
+            } finally {
+                hideProgress();
+                btnPdf.disabled   = false;
+                btnPrint.disabled = false;
+            }
+        }
+
+        loadReportData();
+    </script>
+</body>
+</html>

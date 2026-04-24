@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1B2068" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="GEMAR-KKP" />
+    <link rel="apple-touch-icon" href="../assets/img/logo.svg" />
+    <title>GEMAR-KKP · Approval Laporan</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../assets/css/gemar-style.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
+    <script src="../assets/js/loader.js"></script>
+    <style>
+        /* ── Filter Bar ─────────────────────────────────────────── */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: flex-end;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .filter-bar .field { display: flex; flex-direction: column; gap: 0.35rem; }
+        .filter-bar label  { font-size: 0.75rem; font-weight: 600; color: var(--text-main); opacity: .7; text-transform: uppercase; letter-spacing: .04em; }
+        .filter-bar select,
+        .filter-bar input  { padding: .45rem .75rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: .875rem; color: var(--text-main); background: var(--surface-main); }
+        .filter-bar .btn-filter { padding: .5rem 1.25rem; background: var(--primary-main); color: #fff; border: none; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; font-size: .875rem; }
+        .filter-bar .btn-filter:hover { background: #2929CC; }
+
+        /* ── Stats mini ─────────────────────────────────────────── */
+        .mini-stats { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .mini-stat  { flex: 1; min-width: 120px; background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem 1.25rem; }
+        .mini-stat__num  { font-size: 1.75rem; font-weight: 700; color: var(--text-main); line-height: 1; }
+        .mini-stat__label{ font-size: .75rem; color: var(--text-main); opacity: .6; margin-top: .25rem; }
+        .mini-stat--pending .mini-stat__num  { color: #B45309; }
+        .mini-stat--approved .mini-stat__num { color: #2D9E3C; }
+        .mini-stat--rejected .mini-stat__num { color: #DC2626; }
+
+        /* ── Table card ─────────────────────────────────────────── */
+        .table-card { background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+        thead { background: var(--surface-main); }
+        thead th { padding: .85rem 1rem; text-align: left; font-weight: 600; color: var(--text-main); opacity: .75; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+        tbody tr { border-top: 1px solid var(--border-color); transition: background .15s; }
+        tbody tr:hover { background: #F8FBFF; }
+        tbody td { padding: .85rem 1rem; color: var(--text-main); vertical-align: middle; }
+
+        /* ── Badge status ───────────────────────────────────────── */
+        .badge { display: inline-flex; align-items: center; gap: .3rem; padding: .25rem .7rem; border-radius: 999px; font-size: .75rem; font-weight: 600; white-space: nowrap; }
+        .badge--pending  { background: #FEF3C7; color: #92400E; }
+        .badge--approved { background: #D1FAE5; color: #065F46; }
+        .badge--rejected { background: #FEE2E2; color: #991B1B; }
+
+        /* ── Bukti links ────────────────────────────────────────── */
+        .bukti-links { display: flex; gap: .4rem; }
+        .bukti-link  { display: inline-flex; align-items: center; gap: .25rem; padding: .2rem .5rem; border-radius: var(--radius-sm); background: #EFF6FF; color: #1D4ED8; font-size: .7rem; font-weight: 600; text-decoration: none; }
+        .bukti-link:hover { background: #DBEAFE; }
+        .bukti-link--empty { background: #F3F4F6; color: #9CA3AF; cursor: default; }
+
+        /* ── Action buttons ─────────────────────────────────────── */
+        .btn-approve { padding: .35rem .85rem; background: #2D9E3C; color: #fff; border: none; border-radius: var(--radius-sm); font-weight: 600; font-size: .8rem; cursor: pointer; }
+        .btn-approve:hover { background: #1F7A2C; }
+        .btn-reject  { padding: .35rem .85rem; background: #fff; color: #DC2626; border: 1px solid #DC2626; border-radius: var(--radius-sm); font-weight: 600; font-size: .8rem; cursor: pointer; }
+        .btn-reject:hover  { background: #FEE2E2; }
+        .btn-approve:disabled, .btn-reject:disabled { opacity: .4; cursor: not-allowed; }
+        .action-btns { display: flex; gap: .5rem; }
+
+        /* ── Nilai ──────────────────────────────────────────────── */
+        .val-main  { font-weight: 600; }
+        .val-sub   { font-size: .75rem; color: #6B7280; }
+
+        /* ── Empty & loading state ──────────────────────────────── */
+        .state-box { padding: 3rem; text-align: center; color: #9CA3AF; }
+        .state-box svg { width: 48px; height: 48px; margin: 0 auto 1rem; display: block; opacity: .4; }
+
+        /* ── Modal ──────────────────────────────────────────────── */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+        .modal-overlay.hidden { display: none; }
+        .modal { background: #fff; border-radius: var(--radius-lg); padding: 2rem; width: 100%; max-width: 480px; box-shadow: 0 25px 50px -12px rgba(0,0,0,.25); }
+        .modal__title { font-size: 1.125rem; font-weight: 700; color: var(--text-main); margin-bottom: .25rem; }
+        .modal__sub   { font-size: .875rem; color: #6B7280; margin-bottom: 1.25rem; }
+        .modal__info  { background: var(--surface-main); border-radius: var(--radius-sm); padding: .75rem 1rem; margin-bottom: 1.25rem; font-size: .875rem; color: var(--text-main); }
+        .modal__info strong { display: block; font-weight: 600; }
+        .modal textarea { width: 100%; padding: .75rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: .875rem; font-family: inherit; resize: vertical; min-height: 100px; box-sizing: border-box; }
+        .modal textarea:focus { outline: none; border-color: var(--primary-main); box-shadow: 0 0 0 3px rgba(10,61,92,.1); }
+        .modal__char { font-size: .75rem; color: #9CA3AF; text-align: right; margin-top: .25rem; }
+        .modal__actions { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 1.25rem; }
+        .btn-cancel { padding: .6rem 1.25rem; background: #F3F4F6; color: var(--text-main); border: none; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; }
+        .btn-submit-reject { padding: .6rem 1.25rem; background: #DC2626; color: #fff; border: none; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; }
+        .btn-submit-reject:hover { background: #B91C1C; }
+        .btn-submit-reject:disabled { opacity: .5; cursor: not-allowed; }
+
+        /* ── Toast ──────────────────────────────────────────────── */
+        .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: .85rem 1.25rem; border-radius: var(--radius-md); font-size: .875rem; font-weight: 600; color: #fff; z-index: 2000; animation: slideUp .25s ease; max-width: 340px; }
+        .toast--success { background: #2D9E3C; }
+        .toast--error   { background: #DC2626; }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <header class="header">
+            <div class="header__brand">
+                <img src="../assets/img/logo.svg" class="header__logo" alt="GEMAR-KKP">
+                <span class="header__title">GEMAR-KKP</span>
+            </div>
+            <nav class="header__nav">
+                <a href="dashboard.html" class="header__link">Dashboard</a>
+                <a href="#" class="header__link header__link--active">Approval</a>
+                <button class="header__btn header__btn--logout" onclick="handleLogout()">Logout</button>
+            </nav>
+        </header>
+
+        <main class="main">
+            <section class="welcome">
+                <h1 class="welcome__title">Approval Laporan Bulanan</h1>
+                <p class="welcome__subtitle" id="userInfo">Memuat data...</p>
+            </section>
+
+            <!-- Filter -->
+            <div class="filter-bar">
+                <div class="field">
+                    <label>Bulan</label>
+                    <select id="filterBulan">
+                        <option value="">Semua Bulan</option>
+                        <option value="1">Januari</option><option value="2">Februari</option>
+                        <option value="3">Maret</option><option value="4">April</option>
+                        <option value="5">Mei</option><option value="6">Juni</option>
+                        <option value="7">Juli</option><option value="8">Agustus</option>
+                        <option value="9">September</option><option value="10">Oktober</option>
+                        <option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Tahun</label>
+                    <input type="number" id="filterTahun" placeholder="2026" min="2024" max="2099" style="width:90px">
+                </div>
+                <div class="field">
+                    <label>Status</label>
+                    <select id="filterStatus">
+                        <option value="pending_approval">Menunggu Approval</option>
+                        <option value="">Semua Status</option>
+                        <option value="approved">Disetujui</option>
+                        <option value="rejected">Ditolak</option>
+                    </select>
+                </div>
+                <button class="btn-filter" onclick="loadReports()">Tampilkan</button>
+            </div>
+
+            <!-- Mini Stats -->
+            <div class="mini-stats">
+                <div class="mini-stat mini-stat--pending">
+                    <div class="mini-stat__num" id="countPending">-</div>
+                    <div class="mini-stat__label">Menunggu Approval</div>
+                </div>
+                <div class="mini-stat mini-stat--approved">
+                    <div class="mini-stat__num" id="countApproved">-</div>
+                    <div class="mini-stat__label">Disetujui</div>
+                </div>
+                <div class="mini-stat mini-stat--rejected">
+                    <div class="mini-stat__num" id="countRejected">-</div>
+                    <div class="mini-stat__label">Ditolak</div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>UPT</th>
+                                <th>Periode</th>
+                                <th>Listrik</th>
+                                <th>Air</th>
+                                <th>Telepon</th>
+                                <th>Bukti</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td colspan="8"><div class="state-box">Memuat data...</div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Reject -->
+    <div class="modal-overlay hidden" id="rejectModal">
+        <div class="modal">
+            <div class="modal__title">Tolak Laporan</div>
+            <div class="modal__sub">Berikan alasan penolakan yang jelas agar UPT dapat memperbaiki laporannya.</div>
+            <div class="modal__info">
+                <strong id="modalUpt">-</strong>
+                <span id="modalPeriode">-</span>
+            </div>
+            <textarea id="rejectAlasan" placeholder="Contoh: Bukti foto tagihan listrik tidak terbaca. Mohon upload ulang dengan foto yang lebih jelas dan pastikan nomor rekening terlihat." maxlength="500"></textarea>
+            <div class="modal__char"><span id="charCount">0</span>/500</div>
+            <div class="modal__actions">
+                <button class="btn-cancel" onclick="closeRejectModal()">Batal</button>
+                <button class="btn-submit-reject" id="btnSubmitReject" onclick="submitReject()">Tolak Laporan</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/auth.js"></script>
+    <script>
+        const user = requireAuth();
+        if (!user) throw new Error('redirect');
+        if (user.role === 'upt_admin') {
+            window.location.href = 'dashboard.html';
+        }
+
+        const NAMA_BULAN = [
+            '', 'Januari','Februari','Maret','April','Mei','Juni',
+            'Juli','Agustus','September','Oktober','November','Desember'
+        ];
+
+        const roleLabels = { eselon1: 'Sekretaris Ditjen / Badan', superadmin: 'Sekretaris Jenderal' };
+        document.getElementById('userInfo').textContent = (user.name || '') + ' — ' + (roleLabels[user.role] || user.role);
+
+        // Set default tahun
+        document.getElementById('filterTahun').value = new Date().getFullYear();
+
+        let allReports = [];
+        let rejectTargetId = null;
+
+        async function loadReports() {
+            PageLoader.start('Memuat data laporan...');
+            const body = new URLSearchParams({
+                action: 'report.monthly.list',
+                token: getToken()
+            });
+
+            try {
+                const res    = await fetch(AUTH_CONFIG.apiUrl, { method: 'POST', body });
+                const result = await res.json();
+                if (!result.success) throw new Error(result.error);
+
+                allReports = result.data.reports || [];
+                renderTable(allReports);
+                updateStats(allReports);
+                PageLoader.finish();
+            } catch (err) {
+                PageLoader.error(
+                    'Gagal memuat data laporan: ' + err.message,
+                    loadReports
+                );
+            }
+        }
+
+        function renderTable(reports) {
+            const filterBulan  = document.getElementById('filterBulan').value;
+            const filterTahun  = document.getElementById('filterTahun').value;
+            const filterStatus = document.getElementById('filterStatus').value;
+
+            const filtered = reports.filter(r => {
+                if (filterBulan  && String(r.bulan)  !== filterBulan)  return false;
+                if (filterTahun  && String(r.tahun)  !== filterTahun)  return false;
+                if (filterStatus && r.status !== filterStatus)          return false;
+                return true;
+            });
+
+            const tbody = document.getElementById('tableBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8"><div class="state-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    Tidak ada laporan ditemukan</div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(r => {
+                const periode  = NAMA_BULAN[parseInt(r.bulan)] + ' ' + r.tahun;
+                const isPending = r.status === 'pending_approval';
+
+                const badgeClass = { pending_approval: 'badge--pending', approved: 'badge--approved', rejected: 'badge--rejected' }[r.status] || 'badge--pending';
+                const badgeText  = { pending_approval: 'Menunggu', approved: 'Disetujui', rejected: 'Ditolak' }[r.status] || r.status;
+
+                const buktiHtml = `
+                    ${r.listrik_bukti ? `<a href="${r.listrik_bukti}" target="_blank" class="bukti-link">Listrik</a>` : '<span class="bukti-link bukti-link--empty">Listrik</span>'}
+                    ${r.air_bukti     ? `<a href="${r.air_bukti}"     target="_blank" class="bukti-link">Air</a>`     : '<span class="bukti-link bukti-link--empty">Air</span>'}
+                    ${r.telepon_bukti ? `<a href="${r.telepon_bukti}" target="_blank" class="bukti-link">Telepon</a>` : '<span class="bukti-link bukti-link--empty">Telepon</span>'}
+                `;
+
+                const rejectInfo = r.status === 'rejected' && r.reject_reason
+                    ? `<div style="font-size:.72rem;color:#991B1B;margin-top:.3rem;max-width:160px;word-break:break-word">Alasan: ${escHtml(r.reject_reason)}</div>`
+                    : '';
+
+                const actionHtml = isPending ? `
+                    <div class="action-btns">
+                        <button class="btn-approve" onclick="approveReport('${escHtml(String(r.id))}', this)">Setujui</button>
+                        <button class="btn-reject"  onclick="openRejectModal('${escHtml(String(r.id))}', '${escHtml(String(r.upt_id))}', '${escHtml(periode)}')">Tolak</button>
+                    </div>` : '<span style="color:#9CA3AF;font-size:.8rem">—</span>';
+
+                return `<tr>
+                    <td><span class="val-main">${escHtml(String(r.upt_id))}</span></td>
+                    <td>${escHtml(periode)}</td>
+                    <td>
+                        <div class="val-main">${fmtNum(r.listrik_kwh)} kWh</div>
+                        <div class="val-sub">${fmtRp(r.listrik_harga)}</div>
+                    </td>
+                    <td>
+                        <div class="val-main">${fmtNum(r.air_kubik)} m³</div>
+                        <div class="val-sub">${fmtRp(r.air_harga)}</div>
+                    </td>
+                    <td>
+                        <div class="val-main">${fmtNum(r.telepon_jam)} jam</div>
+                        <div class="val-sub">${fmtRp(r.telepon_harga)}</div>
+                    </td>
+                    <td><div class="bukti-links">${buktiHtml}</div></td>
+                    <td><span class="badge ${badgeClass}">${badgeText}</span>${rejectInfo}</td>
+                    <td>${actionHtml}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function updateStats(reports) {
+            document.getElementById('countPending').textContent  = reports.filter(r => r.status === 'pending_approval').length;
+            document.getElementById('countApproved').textContent = reports.filter(r => r.status === 'approved').length;
+            document.getElementById('countRejected').textContent = reports.filter(r => r.status === 'rejected').length;
+        }
+
+        async function approveReport(reportId, btn) {
+            if (!confirm('Setujui laporan ini?')) return;
+            btn.disabled = true;
+            btn.textContent = 'Menyetujui...';
+            btn.nextElementSibling.disabled = true;
+
+            const body = new URLSearchParams({
+                action: 'report.monthly.approve',
+                token: getToken(),
+                report_id: reportId
+            });
+
+            try {
+                const res    = await fetch(AUTH_CONFIG.apiUrl, { method: 'POST', body });
+                const result = await res.json();
+                if (!result.success) throw new Error(result.error);
+                showToast('Laporan berhasil disetujui.', 'success');
+                await loadReports();
+            } catch (err) {
+                showToast('Gagal: ' + err.message, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Setujui';
+                btn.nextElementSibling.disabled = false;
+            }
+        }
+
+        function openRejectModal(reportId, uptId, periode) {
+            rejectTargetId = reportId;
+            document.getElementById('modalUpt').textContent     = uptId;
+            document.getElementById('modalPeriode').textContent = periode;
+            document.getElementById('rejectAlasan').value       = '';
+            document.getElementById('charCount').textContent    = '0';
+            document.getElementById('rejectModal').classList.remove('hidden');
+            document.getElementById('rejectAlasan').focus();
+        }
+
+        function closeRejectModal() {
+            document.getElementById('rejectModal').classList.add('hidden');
+            rejectTargetId = null;
+        }
+
+        document.getElementById('rejectAlasan').addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length;
+        });
+
+        async function submitReject() {
+            const alasan = document.getElementById('rejectAlasan').value.trim();
+            if (alasan.length < 10) {
+                showToast('Alasan minimal 10 karakter.', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmitReject');
+            btn.disabled = true;
+            btn.textContent = 'Mengirim...';
+
+            const body = new URLSearchParams({
+                action: 'report.monthly.reject',
+                token: getToken(),
+                report_id: rejectTargetId,
+                alasan: alasan
+            });
+
+            try {
+                const res    = await fetch(AUTH_CONFIG.apiUrl, { method: 'POST', body });
+                const result = await res.json();
+                if (!result.success) throw new Error(result.error);
+                showToast(result.data.message, 'success');
+                closeRejectModal();
+                await loadReports();
+            } catch (err) {
+                showToast('Gagal: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Tolak Laporan';
+            }
+        }
+
+        // Tutup modal klik di luar
+        document.getElementById('rejectModal').addEventListener('click', function(e) {
+            if (e.target === this) closeRejectModal();
+        });
+
+        // ── Helpers ──────────────────────────────────────────────
+        function fmtNum(val) {
+            const n = parseFloat(val) || 0;
+            return n.toLocaleString('id-ID');
+        }
+        function fmtRp(val) {
+            const n = parseFloat(val) || 0;
+            return 'Rp ' + n.toLocaleString('id-ID');
+        }
+        function escHtml(str) {
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+        function showToast(msg, type) {
+            const t = document.createElement('div');
+            t.className = 'toast toast--' + type;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 4000);
+        }
+
+        // Load on start
+        loadReports();
+    </script>
+</body>
+</html>

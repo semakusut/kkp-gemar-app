@@ -1,45 +1,44 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0A3D5C" />
+    <meta name="theme-color" content="#1B2068" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="GEMAR-KKP" />
+    <link rel="apple-touch-icon" href="../assets/img/logo.svg" />
     <title>GEMAR-KKP · Dashboard</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="assets/css/gemar-style.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg" />
+    <link rel="stylesheet" href="../assets/css/gemar-style.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
 </head>
 
 <body>
     <div class="dashboard">
-        <!-- Header -->
         <header class="header">
             <div class="header__brand">
-                <img src="assets/img/logo.svg" class="header__logo" alt="GEMAR-KKP">
+                <img src="../assets/img/logo.svg" class="header__logo" alt="GEMAR-KKP">
                 <span class="header__title">GEMAR-KKP</span>
             </div>
             <nav class="header__nav">
                 <a href="#" class="header__link header__link--active">Dashboard</a>
-                <a href="laporan-bulanan.html" class="header__link">Laporan Bulanan</a>
+                <a href="list-laporan.html" class="header__link">List Laporan</a>
                 <button class="header__btn header__btn--logout" onclick="handleLogout()">Logout</button>
             </nav>
         </header>
 
-        <!-- Main Content -->
         <main class="main">
-            <!-- Welcome Section -->
             <section class="welcome">
                 <h1 class="welcome__title">Selamat datang, <span id="userName">-</span></h1>
                 <p class="welcome__subtitle" id="userRole">-</p>
             </section>
 
-            <!-- Stats Grid -->
             <section class="stats">
                 <div class="stat-card">
                     <div class="stat-card__icon stat-card__icon--listrik">
@@ -95,7 +94,6 @@
                 </div>
             </section>
 
-            <!-- Quick Actions -->
             <section class="actions">
                 <h2 class="section-title">Aksi Cepat</h2>
                 <div class="actions__grid">
@@ -105,16 +103,33 @@
                                 <path d="M12 5v14M5 12h14"/>
                             </svg>
                         </div>
-                        <span>Buat Laporan Bulanan</span>
+                        <span>Buat Laporan</span>
                     </a>
-                    <a href="laporan-bulanan.html" class="action-card">
+                    <a href="list-laporan.html" class="action-card">
                         <div class="action-card__icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
                                 <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
                             </svg>
                         </div>
-                        <span>Laporan Bulanan</span>
+                        <span>List Laporan</span>
+                    </a>
+                    <a href="profile.html" class="action-card">
+                        <div class="action-card__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                        <span>Profil</span>
+                    </a>
+                    <a href="final-report.html" class="action-card" id="finalReportBtn" style="display:none">
+                        <div class="action-card__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <span>Final Report</span>
                     </a>
                     <a href="approval.html" class="action-card" id="approvalBtn" style="display:none">
                         <div class="action-card__icon">
@@ -139,15 +154,14 @@
         </main>
     </div>
 
-    <script src="assets/js/auth.js"></script>
+    <script src="../assets/js/auth.js"></script>
     <script>
-        // requireAuth() cek token di localStorage/sessionStorage dan validasi expiry
         const user = requireAuth();
         if (!user) throw new Error('redirect to login');
 
         const roleLabels = {
-            'upt_admin':  'Admin UPT',
-            'eselon1':    'Sekretaris Ditjen / Badan',
+            'upt_admin': 'Admin UPT',
+            'eselon1': 'Sekretaris Ditjen / Badan',
             'superadmin': 'Sekretaris Jenderal'
         };
         document.getElementById('userName').textContent = user.name || 'User';
@@ -155,11 +169,11 @@
 
         if (user.role === 'eselon1' || user.role === 'superadmin') {
             document.getElementById('approvalBtn').style.display = 'flex';
+            document.getElementById('finalReportBtn').style.display = 'flex';
         }
         if (user.role === 'superadmin') {
             document.getElementById('adminBtn').style.display = 'flex';
         }
     </script>
 </body>
-
 </html>

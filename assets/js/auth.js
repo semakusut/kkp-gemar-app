@@ -116,7 +116,7 @@ async function handleLogin() {
 
     if (result.success) {
       saveSession_(result.data.token, result.data.user, remember);
-      window.location.href = 'dashboard.html';
+      window.location.href = '../pages/dashboard.html';
     } else {
       showError_(result.error || 'Login gagal. Periksa email dan password.');
     }
@@ -188,7 +188,7 @@ function handleLogout() {
     }).catch(function () { });
   }
   clearSession();
-  window.location.href = 'index.html';
+  window.location.href = '../index.html';
 }
 
 /**
@@ -198,7 +198,7 @@ function handleLogout() {
 function requireAuth() {
   if (!isSessionValid()) {
     clearSession();
-    window.location.href = 'index.html';
+    window.location.href = '../index.html';
     return null;
   }
   return getUser();
