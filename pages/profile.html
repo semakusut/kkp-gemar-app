@@ -19,43 +19,46 @@
     <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
 
     <style>
-        .container { max-width: 600px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .container { max-width: 500px; margin: 0 auto; padding: 1.5rem 1rem; }
         
-        .page-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 1.5rem; }
+        .page-title { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 1rem; }
         
         .card {
             background: #fff;
             border-radius: var(--radius-lg);
             border: 1px solid var(--border-color);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
         }
-        .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-main); }
+        .card:last-child { margin-bottom: 0; }
+        .card-title { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.05em; }
         
         .profile-row {
             display: flex;
-            padding: 0.75rem 0;
+            padding: 0.5rem 0;
             border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
         }
         .profile-row:last-child { border-bottom: none; }
-        .profile-label { width: 120px; color: var(--text-muted); font-size: 0.875rem; }
-        .profile-value { flex: 1; font-weight: 500; }
+        .profile-label { width: 90px; color: var(--text-muted); flex-shrink: 0; }
+        .profile-value { flex: 1; font-weight: 500; word-break: break-word; }
         
-        .field { margin-bottom: 1rem; }
-        .field label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.375rem; }
+        .field { margin-bottom: 0.75rem; }
+        .field label { display: block; font-size: 0.8125rem; font-weight: 500; margin-bottom: 0.25rem; }
         .field input {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 0.625rem 0.875rem;
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            font-size: 0.9375rem;
+            font-size: 0.875rem;
+            box-sizing: border-box;
         }
         .field input:focus { outline: none; border-color: var(--primary-main); box-shadow: 0 0 0 3px rgba(10,61,92,0.1); }
         
         .btn {
-            padding: 0.75rem 1.5rem;
+            padding: 0.625rem 1.25rem;
             border-radius: var(--radius-md);
-            font-size: 0.875rem;
+            font-size: 0.8125rem;
             font-weight: 500;
             cursor: pointer;
             border: none;
@@ -64,7 +67,7 @@
         .btn--primary { background: var(--primary-main); color: #fff; }
         .btn--primary:hover { background: var(--primary-dark); }
         
-        .msg { padding: 0.75rem 1rem; border-radius: var(--radius-md); margin-bottom: 1rem; font-size: 0.875rem; }
+        .msg { padding: 0.625rem 0.875rem; border-radius: var(--radius-md); margin-bottom: 0.75rem; font-size: 0.8125rem; }
         .msg--success { background: #D1FAE5; color: #065F46; }
         .msg--error { background: #FEE2E2; color: #991B1B; }
     </style>
@@ -88,7 +91,6 @@
                 <h1 class="page-title">Profil Saya</h1>
                 
                 <div class="card">
-                    <h2 class="card-title">Informasi Akun</h2>
                     <div class="profile-row">
                         <span class="profile-label">Nama</span>
                         <span class="profile-value" id="userName">-</span>
@@ -108,7 +110,7 @@
                 </div>
 
                 <div class="card">
-                    <h2 class="card-title">Ubah Password</h2>
+                    <div class="card-title">Ubah Password</div>
                     <div id="msgBox"></div>
                     
                     <div class="field">
@@ -117,14 +119,14 @@
                     </div>
                     <div class="field">
                         <label>Password Baru</label>
-                        <input type="password" id="newPassword" placeholder="Masukkan password baru (min 6 karakter)">
+                        <input type="password" id="newPassword" placeholder="Min 6 karakter">
                     </div>
                     <div class="field">
-                        <label>Konfirmasi Password Baru</label>
+                        <label>Konfirmasi</label>
                         <input type="password" id="confirmPassword" placeholder="Masukkan password baru lagi">
                     </div>
                     
-                    <button class="btn btn--primary" onclick="changePassword()">Simpan Password</button>
+                    <button class="btn btn--primary" onclick="changePassword()">Simpan</button>
                 </div>
             </div>
         </main>
@@ -151,12 +153,12 @@
         // Tentukan action dan kode berdasarkan role
         var unitKerjaAction = null;
         var unitKerjaKode   = null;
-        if (user.role === 'eselon1' && user.eselon1Id) {
+        if (user.role === 'eselon1' && user.eselon1_id) {
             unitKerjaAction = 'master.eselon1.get';
-            unitKerjaKode   = user.eselon1Id;
-        } else if (user.uptId) {
+            unitKerjaKode   = user.eselon1_id;
+        } else if (user.upt_id) {
             unitKerjaAction = 'master.upt.get';
-            unitKerjaKode   = user.uptId;
+            unitKerjaKode   = user.upt_id;
         }
 
         if (!unitKerjaAction) {
