@@ -163,7 +163,11 @@
     }
 
     .form__forgot {
-        color: var(--ocean);
+        color: rgba(255, 255, 255, 0.75);
+    }
+
+    .form__forgot:hover {
+        color: #fff;
     }
 
     .btn {
@@ -192,8 +196,10 @@
     }
 
     .form__footer.mobile-only a {
-        color: var(--ocean);
+        color: rgba(255, 255, 255, 0.9);
         font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 2px;
     }
 
     .form__error {

@@ -190,7 +190,8 @@ function handleLogout() {
     }).catch(function () { });
   }
   clearSession();
-  window.location.href = '../index.html';
+  // replace() agar back button tidak kembali ke halaman protected setelah logout
+  window.location.replace('../index.html');
 }
 
 /**
@@ -200,7 +201,8 @@ function handleLogout() {
 function requireAuth() {
   if (!isSessionValid()) {
     clearSession();
-    window.location.href = '../index.html';
+    // replace() agar back button tidak balik ke halaman protected setelah session expired
+    window.location.replace('../index.html');
     return null;
   }
   return getUser();
