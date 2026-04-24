@@ -321,7 +321,7 @@
             if (!res.ok) throw new Error('HTTP Error ' + res.status);
             const result = await res.json();
             if (!result.success) throw new Error(result.error || 'Upload gagal');
-            return result.url;
+            return result.data.url;
         }
 
         async function submitMonthlyReport() {
@@ -337,12 +337,12 @@
             const fileAir = document.getElementById('air_file').files[0];
             const fileTelepon = document.getElementById('telepon_file').files[0];
 
-            // Validate file size (Max 2MB)
-            const MAX_SIZE = 2 * 1024 * 1024;
-            if ((fileListrik && fileListrik.size > MAX_SIZE) || 
-                (fileAir && fileAir.size > MAX_SIZE) || 
+            // Validate file size (Max 6MB)
+            const MAX_SIZE = 6 * 1024 * 1024;
+            if ((fileListrik && fileListrik.size > MAX_SIZE) ||
+                (fileAir && fileAir.size > MAX_SIZE) ||
                 (fileTelepon && fileTelepon.size > MAX_SIZE)) {
-                return showError("Ukuran file maksimal adalah 2MB per nota.");
+                return showError("Ukuran file maksimal adalah 6MB per nota.");
             }
 
             setLoading_(btn, true);
