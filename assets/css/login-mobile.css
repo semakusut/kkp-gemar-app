@@ -50,7 +50,7 @@
     .page {
         grid-template-columns: 1fr !important;
         min-height: 100vh;
-        background: linear-gradient(165deg, #0A3D5C 0%, #0E5575 60%, #0F6980 100%);
+        background: linear-gradient(165deg, #1B2068 0%, #252A90 60%, #3535EE 100%);
     }
 
     .page__form {
@@ -124,8 +124,8 @@
 
     .field__input:focus {
         background: rgba(255, 255, 255, 0.15);
-        border-color: var(--teal-200);
-        box-shadow: 0 0 0 3px rgba(74, 207, 166, 0.2);
+        border-color: var(--ocean);
+        box-shadow: 0 0 0 3px rgba(53, 53, 238, 0.2);
     }
 
     .field__icon {
@@ -154,20 +154,20 @@
     }
 
     .checkbox input:checked + .checkbox__box {
-        background: var(--teal-200);
-        border-color: var(--teal-200);
+        background: var(--ocean);
+        border-color: var(--ocean);
     }
 
     .checkbox input:checked + .checkbox__box::after {
-        border-color: #0A3D5C;
+        border-color: #1B2068;
     }
 
     .form__forgot {
-        color: var(--teal-200);
+        color: var(--ocean);
     }
 
     .btn {
-        background: var(--teal-400);
+        background: var(--ocean);
         width: 100%;
         justify-content: center;
         padding: 16px 24px;
@@ -175,7 +175,7 @@
     }
 
     .btn:hover {
-        background: var(--teal-300);
+        background: var(--ocean-dark);
     }
 
     .btn__arrow {
@@ -192,7 +192,7 @@
     }
 
     .form__footer.mobile-only a {
-        color: var(--teal-200);
+        color: var(--ocean);
         font-weight: 600;
     }
 
@@ -216,7 +216,7 @@
     left: 0;
     right: 0;
     height: 56px;
-    background: rgba(10, 61, 92, 0.95);
+    background: rgba(53, 53, 238, 0.95);
     backdrop-filter: blur(10px);
     z-index: 1000;
     align-items: center;

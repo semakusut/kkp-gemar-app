@@ -80,9 +80,8 @@ html {
 }
 
 .header__logo {
-    width: 34px;
-    height: 34px;
-    filter: brightness(0) invert(1);
+    width: 36px;
+    height: 36px;
 }
 
 .header__title {

@@ -3,7 +3,7 @@
  * Network First with Auto-Update Notification
  */
 
-const CACHE_NAME = 'gemar-kkp-v2.1.1';
+const CACHE_NAME = 'gemar-kkp-v2.2.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
