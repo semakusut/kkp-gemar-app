@@ -92,10 +92,9 @@ async function handleLogin() {
   }
 
   setLoading_(btn, true);
+  if (typeof PageLoader !== 'undefined') PageLoader.start('Memeriksa akun...');
 
   try {
-    // URLSearchParams → Content-Type: application/x-www-form-urlencoded
-    // Ini "simple request" CORS — tidak ada preflight OPTIONS → tidak ada CORS error
     var body = new URLSearchParams({
       action: 'auth.login',
       email: email,
@@ -116,13 +115,16 @@ async function handleLogin() {
 
     if (result.success) {
       saveSession_(result.data.token, result.data.user, remember);
-      window.location.href = '../pages/dashboard.html';
+      if (typeof PageLoader !== 'undefined') PageLoader.setMessage('Masuk berhasil, mengarahkan...');
+      window.location.href = 'dashboard.html';
     } else {
+      if (typeof PageLoader !== 'undefined') PageLoader.finish();
       showError_(result.error || 'Login gagal. Periksa email dan password.');
     }
 
   } catch (err) {
     console.error('[GEMAR-KKP] Login error:', err);
+    if (typeof PageLoader !== 'undefined') PageLoader.finish();
     showError_('Gagal terhubung ke server. Periksa koneksi internet dan coba lagi.');
   } finally {
     setLoading_(btn, false);
@@ -224,7 +226,7 @@ function saveQueue_(q) {
 function enqueueRequest(payload) {
   var q = getQueue_();
   q.push({
-    id: Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+    id: Date.now() + '-' + Math.random().toString(36).substring(2, 7),
     timestamp: Date.now(),
     payload: payload
   });
@@ -276,3 +278,45 @@ window.addEventListener('online', processQueue);
 
 // Jalankan sekali saat script dimuat (misal saat buka dashboard)
 setTimeout(processQueue, 1000);
+
+// ── ApiCache — sessionStorage cache dengan TTL ────────────────────────────────
+// Menghindari re-fetch data yang sama saat navigasi antar halaman.
+// TTL default 2 menit — cukup untuk covert navigasi normal, tidak stale lama.
+const ApiCache = (() => {
+  const TTL = 2 * 60 * 1000;
+
+  function _key(ns) {
+    try { const u = getUser(); return 'gc_' + (u ? u.id : 'x') + '_' + ns; }
+    catch(e) { return 'gc_x_' + ns; }
+  }
+
+  function get(ns) {
+    try {
+      const raw = sessionStorage.getItem(_key(ns));
+      if (!raw) return null;
+      const { d, t } = JSON.parse(raw);
+      if (Date.now() - t > TTL) { del(ns); return null; }
+      return d;
+    } catch(e) { return null; }
+  }
+
+  function set(ns, data) {
+    try { sessionStorage.setItem(_key(ns), JSON.stringify({ d: data, t: Date.now() })); }
+    catch(e) {}
+  }
+
+  function del(ns) {
+    try { sessionStorage.removeItem(_key(ns)); } catch(e) {}
+  }
+
+  // Hapus semua cache milik user yang sedang login
+  function invalidateAll() {
+    try {
+      const u = getUser();
+      const prefix = 'gc_' + (u ? u.id : 'x') + '_';
+      Object.keys(sessionStorage).filter(k => k.startsWith(prefix)).forEach(k => sessionStorage.removeItem(k));
+    } catch(e) {}
+  }
+
+  return { get, set, del, invalidateAll };
+})();

@@ -240,9 +240,23 @@
 
         let allReports = [];
         let rejectTargetId = null;
+        const APPROVAL_CACHE_KEY = 'approval_list_all';
 
-        async function loadReports() {
-            PageLoader.start('Memuat data laporan...');
+        async function loadReports(isSilent = false) {
+            // Render dari cache dulu — filter tetap jalan di client
+            if (!isSilent) {
+                const cached = ApiCache.get(APPROVAL_CACHE_KEY);
+                if (cached) {
+                    allReports = cached;
+                    renderTable(allReports);
+                    updateStats(allReports);
+                    // Refresh di background
+                    loadReports(true);
+                    return;
+                }
+                PageLoader.start('Memuat data laporan...');
+            }
+
             const body = new URLSearchParams({
                 action: 'report.monthly.list',
                 token: getToken()
@@ -254,11 +268,12 @@
                 if (!result.success) throw new Error(result.error);
 
                 allReports = result.data.reports || [];
+                ApiCache.set(APPROVAL_CACHE_KEY, allReports);
                 renderTable(allReports);
                 updateStats(allReports);
-                PageLoader.finish();
+                if (!isSilent) PageLoader.finish();
             } catch (err) {
-                PageLoader.error(
+                if (!isSilent) PageLoader.error(
                     'Gagal memuat data laporan: ' + err.message,
                     loadReports
                 );
@@ -355,6 +370,9 @@
                 const result = await res.json();
                 if (!result.success) throw new Error(result.error);
                 showToast('Laporan berhasil disetujui.', 'success');
+                ApiCache.del(APPROVAL_CACHE_KEY);
+                ApiCache.del('monthly_list_all');
+                ApiCache.del('list_page_0');
                 await loadReports();
             } catch (err) {
                 showToast('Gagal: ' + err.message, 'error');
@@ -407,6 +425,9 @@
                 if (!result.success) throw new Error(result.error);
                 showToast(result.data.message, 'success');
                 closeRejectModal();
+                ApiCache.del(APPROVAL_CACHE_KEY);
+                ApiCache.del('monthly_list_all');
+                ApiCache.del('list_page_0');
                 await loadReports();
             } catch (err) {
                 showToast('Gagal: ' + err.message, 'error');

@@ -148,27 +148,38 @@
         document.getElementById('userEmail').textContent = user.email || '-';
         document.getElementById('userRole').textContent = roleLabels[user.role] || user.role;
         
-        if (!user.uptId) {
+        // Tentukan action dan kode berdasarkan role
+        var unitKerjaAction = null;
+        var unitKerjaKode   = null;
+        if (user.role === 'eselon1' && user.eselon1Id) {
+            unitKerjaAction = 'master.eselon1.get';
+            unitKerjaKode   = user.eselon1Id;
+        } else if (user.uptId) {
+            unitKerjaAction = 'master.upt.get';
+            unitKerjaKode   = user.uptId;
+        }
+
+        if (!unitKerjaAction) {
             document.getElementById('userUpt').textContent = '-';
             PageLoader.finish();
         } else {
             var params = new URLSearchParams();
-            params.append('action', 'master.upt.get');
+            params.append('action', unitKerjaAction);
             params.append('token', getToken());
-            params.append('kode', user.uptId);
-            
+            params.append('kode', unitKerjaKode);
+
             fetch(AUTH_CONFIG.apiUrl, { method: 'POST', body: params })
             .then(function(res) { return res.json(); })
             .then(function(result) {
                 if (result.success && result.data) {
-                    document.getElementById('userUpt').textContent = result.data.nama || user.uptId;
+                    document.getElementById('userUpt').textContent = result.data.nama || unitKerjaKode;
                 } else {
-                    document.getElementById('userUpt').textContent = user.uptId;
+                    document.getElementById('userUpt').textContent = unitKerjaKode;
                 }
                 PageLoader.finish();
             })
             .catch(function(err) {
-                document.getElementById('userUpt').textContent = user.uptId;
+                document.getElementById('userUpt').textContent = unitKerjaKode;
                 PageLoader.finish();
             });
         }

@@ -202,7 +202,7 @@
                         <h1 class="page-title">Riwayat Laporan</h1>
                         <p class="page-subtitle">Kelola dan lihat riwayat laporan bulanan Anda</p>
                     </div>
-                    <a href="laporan-bulanan.html" class="btn btn--primary">+ Buat Laporan</a>
+                    <a href="laporan-bulanan.html" class="btn btn--primary" id="btnBuatLaporan">+ Buat Laporan</a>
                 </div>
 
                 <div class="card">
@@ -223,8 +223,8 @@
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                             <path d="M9 12h6M9 16h6M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                         </svg>
-                                        <p>Belum ada laporan</p>
-                                        <a href="laporan-bulanan.html" class="btn btn--primary">Buat Laporan Pertama</a>
+                                        <p id="emptyText">Belum ada laporan</p>
+                                        <a href="laporan-bulanan.html" class="btn btn--primary" id="btnBuatPertama">Buat Laporan Pertama</a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -247,12 +247,32 @@
         const user = requireAuth();
         if (!user) throw new Error('redirect to login');
 
+        // Simpan user ke variabel global untuk diakses di fungsi lain
+        currentUser = user;
+
+        // Jika eselon1, sembunyikan tombol buat laporan dan ubah pesan kosong
+        const btnBuatLaporan = document.getElementById('btnBuatLaporan');
+        const btnBuatPertama = document.getElementById('btnBuatPertama');
+        const emptyText = document.getElementById('emptyText');
+        
+        if (user.role === 'eselon1') {
+            if (btnBuatLaporan) btnBuatLaporan.style.display = 'none';
+            if (btnBuatPertama) btnBuatPertama.style.display = 'none';
+            if (emptyText) emptyText.textContent = 'Belum ada laporan yang disetujui';
+        }
+
         const LIMIT = 15;
         let offset = 0;
         let total = 0;
         let currentData = [];
 
         const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        const roleLabels = {
+            'upt_admin': 'Admin UPT',
+            'eselon1': 'Sekretaris Ditjen / Badan',
+            'superadmin': 'Sekretaris Jenderal'
+        };
 
         function formatRupiah(num) {
             return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
@@ -263,31 +283,54 @@
             return labels[status] || status;
         }
 
-        function loadData() {
-            PageLoader.start('Memuat riwayat laporan...');
+        function loadData(isSilent = false) {
+            const CACHE_KEY = 'list_page_' + offset;
+
+            // Halaman pertama: coba render dari cache dulu — instant tanpa spinner
+            if (!isSilent && offset === 0) {
+                const cached = ApiCache.get(CACHE_KEY);
+                if (cached) {
+                    total = cached.total;
+                    currentData = cached.reports;
+                    render(currentData);
+                    updatePagination();
+                    // Refresh di background tanpa spinner
+                    loadData(true);
+                    return;
+                }
+            }
+
+            if (!isSilent) PageLoader.start('Memuat riwayat laporan...');
+
+            const bodyParams = {
+                action: 'report.monthly.list',
+                token: getToken(),
+                limit: LIMIT,
+                offset: offset
+            };
+            if (currentUser && currentUser.role === 'eselon1') {
+                bodyParams.status = 'approved';
+            }
+
             fetch(AUTH_CONFIG.apiUrl, {
                 method: 'POST',
-                body: new URLSearchParams({
-                    action: 'report.monthly.list',
-                    token: getToken(),
-                    limit: LIMIT,
-                    offset: offset
-                })
+                body: new URLSearchParams(bodyParams)
             })
             .then(r => r.json())
             .then(res => {
                 if (!res.success) {
-                    PageLoader.error(res.error || 'Gagal memuat laporan.', loadData);
+                    if (!isSilent) PageLoader.error(res.error || 'Gagal memuat laporan.', loadData);
                     return;
                 }
                 total = res.data.total || 0;
                 currentData = res.data.reports || [];
+                if (offset === 0) ApiCache.set(CACHE_KEY, { total, reports: currentData });
                 render(currentData);
                 updatePagination();
-                PageLoader.finish();
+                if (!isSilent) PageLoader.finish();
             })
             .catch(err => {
-                PageLoader.error(
+                if (!isSilent) PageLoader.error(
                     'Koneksi ke server gagal. Periksa koneksi internet Anda.\n(' + err.message + ')',
                     loadData
                 );
@@ -303,8 +346,11 @@
                 const bulan = BULAN[parseInt(r.bulan) - 1];
                 const total = (parseFloat(r.listrik_harga)||0) + (parseFloat(r.air_harga)||0) + (parseFloat(r.telepon_harga)||0);
                 const statusClass = r.status === 'approved' ? 'status--approved' : r.status === 'rejected' ? 'status--rejected' : 'status--pending';
-                const canEdit = r.status !== 'approved';
-                const canDelete = r.status !== 'approved';
+                
+                // Untuk eselon1: hanya bisa preview, tidak bisa edit/hapus
+                const isEselon1 = currentUser && currentUser.role === 'eselon1';
+                const canEdit = !isEselon1 && r.status !== 'approved';
+                const canDelete = !isEselon1 && r.status !== 'approved';
 
                 html += `<tr>
                     <td style="font-weight:500">${bulan}</td>
@@ -358,11 +404,14 @@
             .then(r => r.json())
             .then(res => {
                 alert(res.success ? 'Dihapus' : 'Gagal: ' + res.error);
-                if (res.success) loadData();
+                if (res.success) {
+                    ApiCache.del('list_page_0');
+                    loadData();
+                }
             });
         }
 
-        if (user.role === 'upt_admin') loadData();
+        loadData();
     </script>
 </body>
 </html>

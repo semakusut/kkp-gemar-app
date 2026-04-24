@@ -3,7 +3,7 @@
  * Network First with Auto-Update Notification
  */
 
-const CACHE_NAME = 'gemar-kkp-v2.2.0';
+const CACHE_NAME = 'gemar-kkp-v2.3.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -22,7 +22,8 @@ const ASSETS_TO_CACHE = [
   './assets/js/auth.js',
   './assets/js/loader.js',
   './assets/img/logo.svg',
-  './manifest.json'
+  './manifest.json',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
 self.addEventListener('install', (event) => {

@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="../assets/css/gemar-style.css">
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../assets/js/loader.js"></script>
 </head>
 
 <body>
@@ -28,6 +30,7 @@
             </div>
             <nav class="header__nav">
                 <a href="#" class="header__link header__link--active">Dashboard</a>
+                <a href="laporan-bulanan.html" class="header__link" id="headerBuat" style="display:none">Buat Laporan</a>
                 <a href="list-laporan.html" class="header__link">List Laporan</a>
                 <button class="header__btn header__btn--logout" onclick="handleLogout()">Logout</button>
             </nav>
@@ -67,14 +70,14 @@
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-card__icon stat-card__icon--bbm">
+                    <div class="stat-card__icon stat-card__icon--telepon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M2 22h20M12 2v20M6 12h4"/>
+                            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
                         </svg>
                     </div>
                     <div class="stat-card__content">
-                        <div class="stat-card__label">Pemakaian BBM</div>
-                        <div class="stat-card__value" id="statBbm">-</div>
+                        <div class="stat-card__label">Pemakaian Telepon</div>
+                        <div class="stat-card__value" id="statTelepon">-</div>
                         <div class="stat-card__change stat-card__change--up">↑ 3% dari bulan lalu</div>
                     </div>
                 </div>
@@ -91,13 +94,21 @@
                         <div class="stat-card__value stat-card__value--gold" id="statHemat">Rp 2.5JT</div>
                         <div class="stat-card__change stat-card__change--down">Target tercapai!</div>
                     </div>
-                </div>
-            </section>
+</div>
+                </section>
 
-            <section class="actions">
+                <section class="charts-section" id="chartsSection" style="display:none">
+                    <h2 class="section-title">Statistik Pemakaian - 6 Bulan Terakhir</h2>
+                    <div class="chart-card">
+                        <canvas id="usageChart"></canvas>
+                    </div>
+                </section>
+
+                <section class="actions">
                 <h2 class="section-title">Aksi Cepat</h2>
                 <div class="actions__grid">
-                    <a href="laporan-bulanan.html" class="action-card">
+                    <!-- Buat Laporan: Hanya untuk upt_admin -->
+                    <a href="laporan-bulanan.html" class="action-card" id="actionBuat" style="display:none">
                         <div class="action-card__icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M12 5v14M5 12h14"/>
@@ -105,7 +116,7 @@
                         </div>
                         <span>Buat Laporan</span>
                     </a>
-                    <a href="list-laporan.html" class="action-card">
+                    <a href="list-laporan.html" class="action-card" id="actionList">
                         <div class="action-card__icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
@@ -123,14 +134,6 @@
                         </div>
                         <span>Profil</span>
                     </a>
-                    <a href="final-report.html" class="action-card" id="finalReportBtn" style="display:none">
-                        <div class="action-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                        </div>
-                        <span>Final Report</span>
-                    </a>
                     <a href="approval.html" class="action-card" id="approvalBtn" style="display:none">
                         <div class="action-card__icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -139,6 +142,14 @@
                             </svg>
                         </div>
                         <span>Approval</span>
+                    </a>
+                    <a href="final-report.html" class="action-card" id="finalReportBtn" style="display:none">
+                        <div class="action-card__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <span>Final Report</span>
                     </a>
                     <a href="admin.html" class="action-card" id="adminBtn" style="display:none">
                         <div class="action-card__icon">
@@ -156,6 +167,8 @@
 
     <script src="../assets/js/auth.js"></script>
     <script>
+        PageLoader.start('Memuat dashboard...');
+
         const user = requireAuth();
         if (!user) throw new Error('redirect to login');
 
@@ -171,9 +184,270 @@
             document.getElementById('approvalBtn').style.display = 'flex';
             document.getElementById('finalReportBtn').style.display = 'flex';
         }
+        if (user.role === 'upt_admin') {
+            document.getElementById('actionBuat').style.display = 'flex';
+            document.getElementById('headerBuat').style.display = 'flex';
+        }
         if (user.role === 'superadmin') {
             document.getElementById('adminBtn').style.display = 'flex';
         }
+
+        const NAMA_BULAN = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
+        const sekarang = new Date();
+        const tahunIni = sekarang.getFullYear();
+        const bulanIni = sekarang.getMonth() + 1;
+
+        let usageChart = null;
+        const CACHE_KEY = 'monthly_list_all';
+
+        async function loadDashboardStats(isSilent = false) {
+            // Render dari cache dulu — instant tanpa spinner
+            if (!isSilent) {
+                const cached = ApiCache.get(CACHE_KEY);
+                if (cached) {
+                    renderDashboard(cached);
+                    PageLoader.finish();
+                    // Refresh data di background tanpa spinner
+                    loadDashboardStats(true);
+                    return;
+                }
+            }
+
+            try {
+                const body = new URLSearchParams({
+                    action: 'report.monthly.list',
+                    token: getToken()
+                });
+                const res = await fetch(AUTH_CONFIG.apiUrl, { method: 'POST', body });
+                const result = await res.json();
+                if (!result.success) throw new Error(result.error);
+
+                const reports = result.data.reports || [];
+                ApiCache.set(CACHE_KEY, reports);
+                renderDashboard(reports);
+                if (!isSilent) PageLoader.finish();
+            } catch (err) {
+                console.error('Load stats error:', err);
+                if (!isSilent) PageLoader.error('Gagal memuat data dashboard.', () => loadDashboardStats());
+            }
+        }
+
+        function renderDashboard(reports) {
+            processStats(reports);
+            if (user.role === 'eselon1' || user.role === 'superadmin') {
+                document.getElementById('chartsSection').style.display = 'block';
+                renderChart(reports);
+            }
+        }
+
+        function processStats(reports) {
+            const currentMonth = bulanIni;
+            const currentYear = tahunIni;
+
+            let filteredReports = reports;
+            if (user.role === 'upt_admin' && user.upt_id) {
+                filteredReports = reports.filter(r => r.upt_id === user.upt_id);
+            }
+
+            const thisMonth = filteredReports.filter(r =>
+                String(r.bulan) === String(currentMonth) &&
+                String(r.tahun) === String(currentYear)
+            );
+
+            const lastMonth = filteredReports.filter(r => {
+                const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+                const prevYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+                return String(r.bulan) === String(prevMonth) && String(r.tahun) === String(prevYear);
+            });
+
+            const calcTotal = (arr, field) => arr.reduce((sum, r) => sum + (parseFloat(r[field]) || 0), 0);
+
+            const listrikNow = calcTotal(thisMonth, 'listrik_kwh');
+            const listrikLast = calcTotal(lastMonth, 'listrik_kwh');
+            const airNow = calcTotal(thisMonth, 'air_kubik');
+            const airLast = calcTotal(lastMonth, 'air_kubik');
+            const teleponNow = calcTotal(thisMonth, 'telepon_jam');
+            const teleponLast = calcTotal(lastMonth, 'telepon_jam');
+
+            document.getElementById('statListrik').textContent = listrikNow.toLocaleString('id-ID') + ' kWh';
+            document.getElementById('statAir').textContent = airNow.toLocaleString('id-ID') + ' m³';
+            document.getElementById('statTelepon').textContent = teleponNow.toLocaleString('id-ID') + ' jam';
+
+            const listChange = listrikLast > 0 ? ((listrikNow - listrikLast) / listrikLast * 100).toFixed(0) : 0;
+            const airChange = airLast > 0 ? ((airNow - airLast) / airLast * 100).toFixed(0) : 0;
+            const telepChange = teleponLast > 0 ? ((teleponNow - teleponLast) / teleponLast * 100).toFixed(0) : 0;
+
+            const listEl = document.getElementById('statListrik').parentElement.querySelector('.stat-card__change');
+            const airEl = document.getElementById('statAir').parentElement.querySelector('.stat-card__change');
+            const telepEl = document.getElementById('statTelepon').parentElement.querySelector('.stat-card__change');
+
+            if (listEl) {
+                if (listChange < 0) {
+                    listEl.textContent = `↓ ${Math.abs(listChange)}% dari bulan lalu`;
+                    listEl.className = 'stat-card__change stat-card__change--down';
+                } else if (listChange > 0) {
+                    listEl.textContent = `↑ ${listChange}% dari bulan lalu`;
+                    listEl.className = 'stat-card__change stat-card__change--up';
+                } else {
+                    listEl.textContent = '= Tidak berubah';
+                    listEl.className = 'stat-card__change';
+                }
+            }
+
+            if (airEl) {
+                if (airChange < 0) {
+                    airEl.textContent = `↓ ${Math.abs(airChange)}% dari bulan lalu`;
+                    airEl.className = 'stat-card__change stat-card__change--down';
+                } else if (airChange > 0) {
+                    airEl.textContent = `↑ ${airChange}% dari bulan lalu`;
+                    airEl.className = 'stat-card__change stat-card__change--up';
+                } else {
+                    airEl.textContent = '= Tidak berubah';
+                    airEl.className = 'stat-card__change';
+                }
+            }
+
+            if (telepEl) {
+                if (telepChange < 0) {
+                    telepEl.textContent = `↓ ${Math.abs(telepChange)}% dari bulan lalu`;
+                    telepEl.className = 'stat-card__change stat-card__change--down';
+                } else if (telepChange > 0) {
+                    telepEl.textContent = `↑ ${telepChange}% dari bulan lalu`;
+                    telepEl.className = 'stat-card__change stat-card__change--up';
+                } else {
+                    telepEl.textContent = '= Tidak berubah';
+                    telepEl.className = 'stat-card__change';
+                }
+            }
+        }
+
+        function renderChart(reports) {
+            // Destroy chart lama sebelum membuat baru (mencegah canvas conflict)
+            if (usageChart) { usageChart.destroy(); usageChart = null; }
+
+            let filteredReports = reports;
+            if (user.role === 'upt_admin' && user.upt_id) {
+                filteredReports = reports.filter(r => r.upt_id === user.upt_id);
+            }
+
+            const bulanLabels = [];
+            const listrikData = [];
+            const airData = [];
+            const teleponData = [];
+
+            for (let i = 5; i >= 0; i--) {
+                let b = bulanIni - i;
+                let y = tahunIni;
+                if (b <= 0) { b += 12; y -= 1; }
+                bulanLabels.push(NAMA_BULAN[b] + ' ' + y);
+
+                const monthReports = filteredReports.filter(r =>
+                    String(r.bulan) === String(b) &&
+                    String(r.tahun) === String(y) &&
+                    r.status === 'approved'
+                );
+
+                const totListrik = monthReports.reduce((sum, r) => sum + (parseFloat(r.listrik_kwh) || 0), 0);
+                const totAir = monthReports.reduce((sum, r) => sum + (parseFloat(r.air_kubik) || 0), 0);
+                const totTelepon = monthReports.reduce((sum, r) => sum + (parseFloat(r.telepon_jam) || 0), 0);
+
+                listrikData.push(totListrik);
+                airData.push(totAir);
+                teleponData.push(totTelepon);
+            }
+
+            const ctx = document.getElementById('usageChart').getContext('2d');
+            usageChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: bulanLabels,
+                    datasets: [
+                        {
+                            label: 'Listrik (kWh)',
+                            data: listrikData,
+                            backgroundColor: 'rgba(217, 119, 6, 0.75)',
+                            borderColor: '#D97706',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Air (m³)',
+                            data: airData,
+                            backgroundColor: 'rgba(37, 99, 235, 0.75)',
+                            borderColor: '#2563EB',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            yAxisID: 'y1'
+                        },
+                        {
+                            label: 'Telepon (jam)',
+                            data: teleponData,
+                            backgroundColor: 'rgba(124, 58, 237, 0.75)',
+                            borderColor: '#7C3AED',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            yAxisID: 'y2'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { family: "'Poppins', sans-serif", size: 12 },
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Listrik (kWh)',
+                                font: { family: "'Poppins', sans-serif", size: 11 }
+                            },
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Air (m³)',
+                                font: { family: "'Poppins', sans-serif", size: 11 }
+                            },
+                            beginAtZero: true,
+                            grid: { drawOnChartArea: false }
+                        },
+                        y2: {
+                            type: 'linear',
+                            display: false,
+                            beginAtZero: true,
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        loadDashboardStats();
+
+        // Silent refresh setiap 5 menit — update data tanpa mengganggu UI
+        setInterval(() => loadDashboardStats(true), 5 * 60 * 1000);
     </script>
 </body>
 </html>
