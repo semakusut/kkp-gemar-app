@@ -3,7 +3,7 @@
  * Network First with Auto-Update Notification
  */
 
-const CACHE_NAME = 'gemar-kkp-v1.0.5'; // Ganti versi ini untuk memicu update
+const CACHE_NAME = 'gemar-kkp-v1.0.6'; // Ganti versi ini untuk memicu update
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

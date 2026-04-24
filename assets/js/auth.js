@@ -10,9 +10,9 @@
  */
 
 const AUTH_CONFIG = {
-  apiUrl:      'https://script.google.com/macros/s/AKfycbybBbrfZHBDD7VjvcdLEQ2Xtdn9wwJTtqHkQ44OVLDfR3zsphcKM-VCW_WXc_Zkrbsn/exec',
-  tokenKey:    'gemar_token',
-  userKey:     'gemar_user',
+  apiUrl: 'https://script.google.com/macros/s/AKfycbzpAKhOFdtChnNiFk0lig9fU_fn0xzPf9yBv5jJVtTlznlS8xtKuWLqFEEjceajPBXD/exec',
+  tokenKey: 'gemar_token',
+  userKey: 'gemar_user',
   rememberKey: 'gemar_remember'
 };
 
@@ -20,7 +20,7 @@ const AUTH_CONFIG = {
 
 function showError_(msg) {
   var form = document.querySelector('.form');
-  var el   = document.getElementById('login-error');
+  var el = document.getElementById('login-error');
   if (!el) {
     el = document.createElement('div');
     el.id = 'login-error';
@@ -56,7 +56,7 @@ function setLoading_(btn, loading) {
 
 function togglePassword() {
   var input = document.getElementById('password');
-  var icon  = document.getElementById('eye-icon');
+  var icon = document.getElementById('eye-icon');
   if (input.type === 'password') {
     input.type = 'text';
     icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><path d="M1 1l22 22"/>';
@@ -69,14 +69,14 @@ function togglePassword() {
 // ── Login ─────────────────────────────────────────────────────────────────────
 
 async function handleLogin() {
-  var emailInput    = document.getElementById('email');
+  var emailInput = document.getElementById('email');
   var passwordInput = document.getElementById('password');
-  var rememberEl    = document.querySelector('.checkbox input[type="checkbox"]');
-  var btn           = document.querySelector('button[type="submit"]');
+  var rememberEl = document.querySelector('.checkbox input[type="checkbox"]');
+  var btn = document.querySelector('button[type="submit"]');
 
-  var email    = emailInput    ? emailInput.value.trim()  : '';
-  var password = passwordInput ? passwordInput.value      : '';
-  var remember = rememberEl    ? rememberEl.checked       : false;
+  var email = emailInput ? emailInput.value.trim() : '';
+  var password = passwordInput ? passwordInput.value : '';
+  var remember = rememberEl ? rememberEl.checked : false;
 
   clearError_();
 
@@ -97,15 +97,15 @@ async function handleLogin() {
     // URLSearchParams → Content-Type: application/x-www-form-urlencoded
     // Ini "simple request" CORS — tidak ada preflight OPTIONS → tidak ada CORS error
     var body = new URLSearchParams({
-      action:   'auth.login',
-      email:    email,
+      action: 'auth.login',
+      email: email,
       password: password,
-      ip:       ''
+      ip: ''
     });
 
     var response = await fetch(AUTH_CONFIG.apiUrl, {
       method: 'POST',
-      body:   body
+      body: body
     });
 
     if (!response.ok) {
@@ -140,17 +140,17 @@ function saveSession_(token, user, remember) {
 
 function getToken() {
   return localStorage.getItem(AUTH_CONFIG.tokenKey) ||
-         sessionStorage.getItem(AUTH_CONFIG.tokenKey);
+    sessionStorage.getItem(AUTH_CONFIG.tokenKey);
 }
 
 function getUser() {
   var raw = localStorage.getItem(AUTH_CONFIG.userKey) ||
-            sessionStorage.getItem(AUTH_CONFIG.userKey);
+    sessionStorage.getItem(AUTH_CONFIG.userKey);
   try { return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
 }
 
 function clearSession() {
-  [localStorage, sessionStorage].forEach(function(s) {
+  [localStorage, sessionStorage].forEach(function (s) {
     s.removeItem(AUTH_CONFIG.tokenKey);
     s.removeItem(AUTH_CONFIG.userKey);
     s.removeItem(AUTH_CONFIG.rememberKey);
@@ -165,10 +165,10 @@ function isSessionValid() {
   var token = getToken();
   if (!token) return false;
   try {
-    var parts   = token.split('.');
+    var parts = token.split('.');
     if (parts.length !== 2) return false;
     // base64url → standard base64
-    var b64     = parts[0].replace(/-/g, '+').replace(/_/g, '/');
+    var b64 = parts[0].replace(/-/g, '+').replace(/_/g, '/');
     var padding = (4 - b64.length % 4) % 4;
     b64 += '=='.slice(0, padding);
     var payload = JSON.parse(atob(b64));
@@ -185,7 +185,7 @@ function handleLogout() {
     fetch(AUTH_CONFIG.apiUrl, {
       method: 'POST',
       body: new URLSearchParams({ action: 'auth.logout', token: token })
-    }).catch(function() {});
+    }).catch(function () { });
   }
   clearSession();
   window.location.href = 'index.html';
@@ -237,26 +237,26 @@ var isProcessingQueue = false;
 
 async function processQueue() {
   if (isProcessingQueue || !navigator.onLine) return;
-  
+
   var q = getQueue_();
   if (q.length === 0) return;
-  
+
   isProcessingQueue = true;
-  
+
   // Ambil item pertama
   var item = q[0];
-  
+
   try {
     var body = new URLSearchParams(item.payload);
     var response = await fetch(AUTH_CONFIG.apiUrl, {
       method: 'POST',
       body: body
     });
-    
+
     if (response.ok) {
       // Sukses, hapus dari queue
       q = getQueue_(); // Refresh queue (in case it changed)
-      q = q.filter(function(x) { return x.id !== item.id; });
+      q = q.filter(function (x) { return x.id !== item.id; });
       saveQueue_(q);
     }
   } catch (err) {

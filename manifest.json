@@ -1,8 +1,8 @@
 {
     "name": "GEMAR-KKP",
     "short_name": "GEMAR-KKP",
-    "description": "Gerakan Hemat Energi - Sistem Pelaporan Penghematan Energi Kementerian Kelautan dan Perhubungan Indonesia",
-    "start_url": "/index.html",
+    "description": "Gerakan Hemat Energi - Sistem Pelaporan Penghematan Energi Kementerian Kelautan dan Perikanan Indonesia",
+    "start_url": "./index.html",
     "display": "standalone",
     "background_color": "#0A3D5C",
     "theme_color": "#0A3D5C",
