@@ -3,15 +3,14 @@
  * Network First with Auto-Update Notification
  */
 
-const CACHE_NAME = 'gemar-kkp-v1.0.3'; // Ganti versi ini untuk memicu update
+const CACHE_NAME = 'gemar-kkp-v1.0.5'; // Ganti versi ini untuk memicu update
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/dashboard.html',
-  '/input-harian.html',
+  '/laporan-bulanan.html',
   '/assets/css/gemar-style.css',
   '/assets/css/dashboard.css',
-  '/assets/css/input-harian.css',
   '/assets/js/auth.js',
   '/assets/img/logo.svg'
 ];
