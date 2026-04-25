@@ -3,23 +3,27 @@
    ============================================================ */
 
 :root {
-    --ocean:      #3535EE;
+    --ocean: #3535EE;
     --ocean-dark: #2929CC;
-    --navy:       #1B2068;
-    --navy-mid:   #252A90;
-    --navy-deep:  #0D0F22;
-    --teal-400:   #2D9E7C;
-    --teal-200:   #4ACFA6;
-    --leaf:       #2D9E3C;
-    --sun:        #F4B400;
-    --paper:      #FFFFFF;
+    --navy: #1B2068;
+    --navy-mid: #252A90;
+    --navy-deep: #0D0F22;
+    --teal-400: #2D9E7C;
+    --teal-200: #4ACFA6;
+    --leaf: #2D9E3C;
+    --sun: #F4B400;
+    --paper: #FFFFFF;
     --paper-dark: #F0F2FF;
-    --border:     rgba(27, 32, 104, 0.10);
+    --border: rgba(27, 32, 104, 0.10);
     --text-muted: #5A6480;
-    --font:       'Poppins', system-ui, sans-serif;
+    --font: 'Poppins', system-ui, sans-serif;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
 body {
     font-family: var(--font);
@@ -57,7 +61,7 @@ html {
     z-index: 100;
     /* wave accent at bottom edge */
     box-shadow: 0 1px 0 rgba(53, 53, 238, 0.3),
-                0 4px 20px rgba(13, 15, 34, 0.25);
+        0 4px 20px rgba(13, 15, 34, 0.25);
 }
 
 /* Subtle wave SVG at bottom of header */
@@ -224,14 +228,34 @@ html {
     flex-shrink: 0;
 }
 
-.stat-card__icon svg { width: 22px; height: 22px; }
+.stat-card__icon svg {
+    width: 22px;
+    height: 22px;
+}
 
-.stat-card__icon--listrik { background: #FEF3C7; color: #D97706; }
-.stat-card__icon--air     { background: #DBEAFE; color: #2563EB; }
-.stat-card__icon--telepon { background: #EDE9FE; color: #7C3AED; }
-.stat-card__icon--hemat   { background: rgba(255, 255, 255, 0.18); color: white; }
+.stat-card__icon--listrik {
+    background: #FEF3C7;
+    color: #D97706;
+}
 
-.stat-card__content { flex: 1; }
+.stat-card__icon--air {
+    background: #DBEAFE;
+    color: #2563EB;
+}
+
+.stat-card__icon--telepon {
+    background: #EDE9FE;
+    color: #7C3AED;
+}
+
+.stat-card__icon--hemat {
+    background: rgba(255, 255, 255, 0.18);
+    color: white;
+}
+
+.stat-card__content {
+    flex: 1;
+}
 
 .stat-card__label {
     font-size: 12px;
@@ -248,7 +272,9 @@ html {
     letter-spacing: -0.5px;
 }
 
-.stat-card__value--gold { color: #FFE066; }
+.stat-card__value--gold {
+    color: #FFE066;
+}
 
 .stat-card__change {
     font-size: 12px;
@@ -256,10 +282,17 @@ html {
     font-weight: 500;
 }
 
-.stat-card__change--down { color: var(--leaf); }
-.stat-card__change--up   { color: #DC2626; }
+.stat-card__change--down {
+    color: var(--leaf);
+}
 
-.stat-card--highlight .stat-card__change--down { color: var(--teal-200); }
+.stat-card__change--up {
+    color: #DC2626;
+}
+
+.stat-card--highlight .stat-card__change--down {
+    color: var(--teal-200);
+}
 
 /* ============================================================
    CHARTS SECTION
@@ -350,7 +383,10 @@ html {
     color: white;
 }
 
-.action-card__icon svg { width: 22px; height: 22px; }
+.action-card__icon svg {
+    width: 22px;
+    height: 22px;
+}
 
 /* ============================================================
    PAGE HEADER (used by inner pages)
@@ -371,9 +407,14 @@ html {
     transition: color 0.15s;
 }
 
-.page-header__back:hover { color: var(--ocean); }
+.page-header__back:hover {
+    color: var(--ocean);
+}
 
-.page-header__back svg { width: 16px; height: 16px; }
+.page-header__back svg {
+    width: 16px;
+    height: 16px;
+}
 
 .page-header__title {
     font-size: 22px;
@@ -436,8 +477,15 @@ html {
 }
 
 @keyframes slideIn {
-    from { opacity: 0; transform: translateX(20px); }
-    to   { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 /* ============================================================
@@ -501,7 +549,9 @@ html {
     color: var(--navy);
 }
 
-.btn-modal--cancel:hover { background: #E2E5FF; }
+.btn-modal--cancel:hover {
+    background: #E2E5FF;
+}
 
 .btn-modal--confirm {
     background: linear-gradient(135deg, var(--navy), var(--ocean));
@@ -591,10 +641,13 @@ html {
         height: calc(56px + env(safe-area-inset-top, 0px));
     }
 
-    .header__nav { gap: 2px; }
+    .header__nav {
+        gap: 2px;
+    }
 
     .header__link {
-        padding: 8px 10px;   /* min 44px touch target via height */
+        padding: 8px 10px;
+        /* min 44px touch target via height */
         font-size: 12.5px;
         min-height: 36px;
     }
@@ -604,24 +657,55 @@ html {
         min-height: 36px;
     }
 
-    .main { padding: 20px 16px; }
+    .main {
+        padding: 20px 16px;
+    }
 
-    .welcome__title { font-size: 20px; }
+    .welcome__title {
+        font-size: 20px;
+    }
 
-    .stats { grid-template-columns: 1fr; }
-    .actions__grid { grid-template-columns: repeat(2, 1fr); }
+    .stats {
+        grid-template-columns: 1fr;
+    }
 
-    .action-card { padding: 20px 12px; min-height: 90px; }
+    .actions__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 
-    .modal { padding: 24px 20px; }
-    .modal__actions { flex-direction: column-reverse; }
-    .btn-modal { width: 100%; justify-content: center; text-align: center; }
+    .action-card {
+        padding: 20px 12px;
+        min-height: 90px;
+    }
+
+    .modal {
+        padding: 24px 20px;
+    }
+
+    .modal__actions {
+        flex-direction: column-reverse;
+    }
+
+    .btn-modal {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
 }
 
 @media (max-width: 480px) {
-    .header__title { display: none; }
-    .actions__grid { grid-template-columns: repeat(2, 1fr); }
-    .header__link { font-size: 12px; padding: 8px 8px; }
+    .header__title {
+        display: none;
+    }
+
+    .actions__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .header__link {
+        font-size: 12px;
+        padding: 8px 8px;
+    }
 }
 
 /* ── iOS tap highlight & active states ──────────────────── */
@@ -630,9 +714,15 @@ html {
         transform: scale(0.97);
         background: #F0F2FF;
     }
-    .header__link:active { background: rgba(255,255,255,0.15); }
+
+    .header__link:active {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
     .btn-primary:active,
-    .btn-modal--confirm:active { transform: scale(0.98); }
+    .btn-modal--confirm:active {
+        transform: scale(0.98);
+    }
 }
 
 /* ── Smooth scrolling on iOS ────────────────────────────── */
@@ -642,6 +732,8 @@ html {
 }
 
 /* ── Prevent 300ms tap delay ─────────────────────────────── */
-a, button, [onclick] {
+a,
+button,
+[onclick] {
     touch-action: manipulation;
 }

@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
     <script src="../assets/js/loader.js"></script>
+    <script src="../assets/js/utils.js"></script>
 
     <style>
         :root {
@@ -539,12 +540,33 @@
             border: none;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
+
+        /* ── Annual view (landscape) ─────────────────────────── */
+        .annual-container { max-width: 29.7cm; margin: 0 auto; background: #fff; padding: 1.2cm 1.5cm; }
+        .annual-title { font-family: 'Times New Roman', serif; font-size: 14pt; font-weight: 700; text-align: center; margin-bottom: 1cm; line-height: 1.4; }
+        .annual-section { margin-bottom: 1.5cm; }
+        .annual-section-title { font-family: 'Times New Roman', serif; font-size: 12pt; font-weight: 700; text-transform: uppercase; margin-bottom: .5cm; border-bottom: 2px solid #1B2068; padding-bottom: .2cm; color: #1B2068; }
+        .annual-table { width: 100%; border-collapse: collapse; font-family: 'Times New Roman', serif; font-size: 9pt; }
+        .annual-table th, .annual-table td { border: 1px solid #000; padding: 4px 6px; }
+        .annual-table th { background: #e8e8e8; font-weight: 700; text-align: center; }
+        .annual-table td.num { text-align: right; white-space: nowrap; font-size: 8pt; }
+        .annual-table td.center { text-align: center; }
+        .pct-plus  { color: #DC2626; font-weight: 700; }
+        .pct-minus { color: #059669; font-weight: 700; }
+        .pct-zero  { color: #6B7280; }
+
+        @media print {
+            .annual-container { padding: 0.3cm 0.5cm; max-width: none; }
+            .annual-table { font-size: 8pt; }
+            .annual-table th, .annual-table td { padding: 2px 3px; }
+            .annual-table td.num { font-size: 7.5pt; }
+        }
 </style>
 </head>
 <body>
     <div class="preview-toolbar">
         <div class="toolbar-left">
-            <button class="btn btn-back" onclick="window.history.back()">
+            <button class="btn btn-back" onclick="handleBack()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                     stroke-linecap="round">
                     <path d="M19 12H5M12 5l-7 7 7 7" />
@@ -665,19 +687,48 @@
         </div>
     </div>
 
+    <div id="annual-content" style="display:none"></div>
+
     <script src="../assets/js/auth.js"></script>
     <script>
         const user = requireAuth();
         if (!user) throw new Error('redirect to login');
 
-        const NAMA_BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        const params = new URLSearchParams(window.location.search);
+        const params   = new URLSearchParams(window.location.search);
         const reportId = params.get('id');
+        const mode     = params.get('mode');
+        const annualTahun = params.get('tahun');
+
+        // NAMA_BULAN from utils.js (1-indexed). preview-laporan uses 0-indexed internally so keep local alias.
+        const BULAN_NAMES = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
         function formatRupiah(num) {
             return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
         }
 
+        function handleBack() {
+            if (window.opener && !window.opener.closed) {
+                window.close();
+            } else {
+                window.history.back();
+            }
+        }
+
+        // Dispatch: annual mode vs single-report mode
+        if (mode === 'annual' && annualTahun) {
+            document.getElementById('laporan-content').style.display = 'none';
+            document.getElementById('annual-content').style.display  = 'block';
+            document.title = 'GEMAR-KKP · Laporan Tahunan ' + annualTahun;
+            // Inject landscape @page so print dialog defaults to landscape
+            const s = document.createElement('style');
+            s.textContent = '@page { size: A4 landscape; margin: 0.8cm; }';
+            document.head.appendChild(s);
+            loadAnnualData(annualTahun);
+        } else {
+            loadReportData();
+        }
+
+        // ── Single-report ─────────────────────────────────────────
         function loadReportData() {
             if (!reportId) {
                 PageLoader.error('ID laporan tidak ditemukan. Buka halaman ini dari daftar laporan.', null);
@@ -732,7 +783,7 @@
 
         function renderReport(r) {
             document.getElementById('upt-name').textContent = r.upt_nama || r.upt_id || user.uptId || '-';
-            document.getElementById('bulan-tahun').textContent = (NAMA_BULAN[parseInt(r.bulan) - 1] || r.bulan) + ' ' + r.tahun;
+            document.getElementById('bulan-tahun').textContent = (BULAN_NAMES[parseInt(r.bulan) - 1] || r.bulan) + ' ' + r.tahun;
 
             const tbody = document.getElementById('table-pengeluaran');
             const rows = [
@@ -888,7 +939,206 @@
             }
         }
 
-        loadReportData();
+        // ── Annual mode ───────────────────────────────────────────
+        async function loadAnnualData(tahun) {
+            PageLoader.start('Memuat data tahunan...');
+            const tahunInt     = parseInt(tahun);
+            const tahunLaluInt = tahunInt - 1;
+
+            try {
+                const [reportsResult, uptResult] = await Promise.all([
+                    fetch(AUTH_CONFIG.apiUrl, {
+                        method: 'POST',
+                        body: new URLSearchParams({ action: 'report.monthly.list', token: getToken(), limit: '500' })
+                    }).then(r => r.json()),
+                    fetch(AUTH_CONFIG.apiUrl, {
+                        method: 'POST',
+                        body: new URLSearchParams({ action: 'master.upt.list', token: getToken() })
+                    }).then(r => r.json()).catch(() => ({}))
+                ]);
+
+                if (!reportsResult.success) throw new Error(reportsResult.error);
+
+                const allReports = reportsResult.data.reports || [];
+
+                const uptList = (uptResult.data && uptResult.data.list) || uptResult.list || [];
+                const uptMap  = {};
+                uptList.forEach(u => {
+                    if (u.kode) uptMap[String(u.kode).toUpperCase()] = u.nama || String(u.kode);
+                });
+
+                const thisYearReports = allReports.filter(r => r.status === 'approved' && String(r.tahun) === String(tahunInt));
+                const lastYearReports = allReports.filter(r => r.status === 'approved' && String(r.tahun) === String(tahunLaluInt));
+
+                const uptIds = [...new Set(thisYearReports.map(r => String(r.upt_id)))].sort();
+
+                // Build UPT × Month matrix
+                const matrix = {};
+                uptIds.forEach(id => { matrix[id] = {}; });
+                thisYearReports.forEach(r => {
+                    const uid  = String(r.upt_id);
+                    const bln  = parseInt(r.bulan);
+                    const biaya = (parseFloat(r.listrik_harga) || 0) + (parseFloat(r.air_harga) || 0) + (parseFloat(r.telepon_harga) || 0);
+                    matrix[uid][bln] = (matrix[uid][bln] || 0) + biaya;
+                });
+
+                // Aggregate per utility for comparison
+                let thisListrik = 0, thisAir = 0, thisTelepon = 0;
+                let lastListrik = 0, lastAir = 0, lastTelepon = 0;
+                thisYearReports.forEach(r => {
+                    thisListrik  += parseFloat(r.listrik_harga)  || 0;
+                    thisAir      += parseFloat(r.air_harga)      || 0;
+                    thisTelepon  += parseFloat(r.telepon_harga)  || 0;
+                });
+                lastYearReports.forEach(r => {
+                    lastListrik  += parseFloat(r.listrik_harga)  || 0;
+                    lastAir      += parseFloat(r.air_harga)      || 0;
+                    lastTelepon  += parseFloat(r.telepon_harga)  || 0;
+                });
+
+                renderAnnualView(tahun, tahunLaluInt, uptIds, uptMap, matrix,
+                    { thisListrik, thisAir, thisTelepon, lastListrik, lastAir, lastTelepon });
+
+                PageLoader.finish();
+            } catch (err) {
+                PageLoader.error('Gagal memuat data tahunan: ' + err.message, () => loadAnnualData(tahun));
+            }
+        }
+
+        function fmtAngka(val) {
+            return Math.round(parseFloat(val) || 0).toLocaleString('id-ID');
+        }
+
+        function renderAnnualView(tahun, tahunLalu, uptIds, uptMap, matrix, totals) {
+            const BULAN_SHORT = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+
+            // Table 1: UPT × Month matrix (values in ribuan / Rp000)
+            const grandTotalPerBulan = new Array(12).fill(0);
+            let grandTotal = 0;
+            let matrixRows = '';
+
+            uptIds.forEach((uid, idx) => {
+                const nama = uptMap[uid.toUpperCase()] || uid;
+                let rowTotal = 0;
+                let cells = '';
+                for (let b = 1; b <= 12; b++) {
+                    const val = matrix[uid][b];
+                    if (val !== undefined) {
+                        rowTotal += val;
+                        grandTotalPerBulan[b - 1] += val;
+                        cells += `<td class="num">${fmtAngka(val)}</td>`;
+                    } else {
+                        cells += `<td class="center" style="color:#9CA3AF;">—</td>`;
+                    }
+                }
+                grandTotal += rowTotal;
+                matrixRows += `<tr>
+                    <td class="center">${idx + 1}</td>
+                    <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(nama)}">${escHtml(nama)}</td>
+                    ${cells}
+                    <td class="num" style="font-weight:700">${fmtAngka(rowTotal)}</td>
+                </tr>`;
+            });
+
+            if (uptIds.length === 0) {
+                matrixRows = `<tr><td colspan="15" style="text-align:center;padding:1rem;color:#9CA3AF;">Belum ada laporan yang disetujui untuk tahun ${escHtml(tahun)}</td></tr>`;
+            } else {
+                const totalCells = grandTotalPerBulan.map(v =>
+                    `<td class="num" style="font-weight:700">${v > 0 ? fmtAngka(v) : '—'}</td>`).join('');
+                matrixRows += `<tr style="background:#f0f0f0">
+                    <td colspan="2" class="center" style="font-weight:700">TOTAL</td>
+                    ${totalCells}
+                    <td class="num" style="font-weight:700">${fmtAngka(grandTotal)}</td>
+                </tr>`;
+            }
+
+            // Table 2: Comparison with previous year
+            function pct(sekarang, lalu) {
+                if (!lalu || lalu === 0) return { text: '—', cls: 'pct-zero' };
+                const delta = ((sekarang - lalu) / lalu) * 100;
+                const cls   = delta > 0 ? 'pct-plus' : (delta < 0 ? 'pct-minus' : 'pct-zero');
+                return { text: (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%', cls };
+            }
+
+            const { thisListrik, thisAir, thisTelepon, lastListrik, lastAir, lastTelepon } = totals;
+            const thisTotal = thisListrik + thisAir + thisTelepon;
+            const lastTotal = lastListrik + lastAir + lastTelepon;
+
+            const compData = [
+                { no: 1, nama: 'Listrik',  lalu: lastListrik,  ini: thisListrik  },
+                { no: 2, nama: 'Air',       lalu: lastAir,      ini: thisAir      },
+                { no: 3, nama: 'Telepon',  lalu: lastTelepon,  ini: thisTelepon  },
+                { no: 4, nama: 'Total',    lalu: lastTotal,    ini: thisTotal, bold: true }
+            ];
+
+            const compRows = compData.map(row => {
+                const p = pct(row.ini, row.lalu);
+                return `<tr ${row.bold ? 'style="background:#f0f0f0;font-weight:700"' : ''}>
+                    <td class="center">${row.no}</td>
+                    <td>${row.nama}</td>
+                    <td class="num">${formatRupiah(row.lalu)}</td>
+                    <td class="num">${formatRupiah(row.ini)}</td>
+                    <td class="num ${p.cls}">${p.text}</td>
+                </tr>`;
+            }).join('');
+
+            const noLastYearNote = lastTotal === 0
+                ? `<br><em>Data tahun ${escHtml(String(tahunLalu))} tidak tersedia dalam sistem.</em>`
+                : '';
+
+            document.getElementById('annual-content').innerHTML = `
+                <div class="annual-container">
+                    <div class="kop">
+                        <div class="kop__title">KEMENTERIAN KELAUTAN DAN PERIKANAN RI</div>
+                        <div class="kop__gemar">GERAKAN MANDIRI HEMAT ENERGI (GEMAR)</div>
+                    </div>
+
+                    <div class="annual-title">
+                        LAPORAN PENGHEMATAN ENERGI TAHUNAN<br>TAHUN ${escHtml(tahun)}
+                    </div>
+
+                    <div class="annual-section">
+                        <div class="annual-section-title">I. Rekapitulasi Pengeluaran UPT per Bulan (Tahun ${escHtml(tahun)})</div>
+                        <div style="overflow-x:auto">
+                            <table class="annual-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width:24px">No</th>
+                                        <th style="min-width:120px;text-align:left">Nama UPT</th>
+                                        ${BULAN_SHORT.map(b => `<th style="min-width:52px">${b}</th>`).join('')}
+                                        <th style="min-width:64px">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${matrixRows}</tbody>
+                            </table>
+                        </div>
+                        <div style="font-size:8pt;color:#666;margin-top:.2cm;">Angka dalam Rupiah (Rp). "—" = belum ada laporan yang disetujui.</div>
+                    </div>
+
+                    <div class="annual-section">
+                        <div class="annual-section-title">II. Perbandingan Pengeluaran dengan Tahun Sebelumnya</div>
+                        <table class="annual-table" style="max-width:560px">
+                            <thead>
+                                <tr>
+                                    <th style="width:28px">No</th>
+                                    <th>Utilitas</th>
+                                    <th>Tahun ${escHtml(String(tahunLalu))} (Rp)</th>
+                                    <th>Tahun ${escHtml(tahun)} (Rp)</th>
+                                    <th style="width:70px">% (+/-)</th>
+                                </tr>
+                            </thead>
+                            <tbody>${compRows}</tbody>
+                        </table>
+                        <div style="font-size:8pt;color:#666;margin-top:.2cm;">
+                            <span style="color:#DC2626;font-weight:700">Merah (+%)</span> = pengeluaran meningkat &nbsp;|&nbsp;
+                            <span style="color:#059669;font-weight:700">Hijau (−%)</span> = pengeluaran berkurang (hemat)
+                            ${noLastYearNote}
+                        </div>
+                    </div>
+
+                    <div class="print-date">Dicetak: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                </div>`;
+        }
     </script>
 </body>
 

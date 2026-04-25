@@ -38,6 +38,8 @@
         .btn-preview { padding:.55rem 1.25rem; background:var(--primary-main); color:#fff; border:none; border-radius:var(--radius-sm); font-weight:700; cursor:pointer; font-size:.875rem; }
         .btn-preview:hover { background:#2929CC; }
         .btn-preview:disabled { opacity:.5; cursor:not-allowed; }
+        .btn-annual-preview { padding:.55rem 1.25rem; background:#059669; color:#fff; border:none; border-radius:var(--radius-sm); font-weight:700; cursor:pointer; font-size:.875rem; display:inline-flex; align-items:center; gap:.4rem; }
+        .btn-annual-preview:hover { background:#047857; }
 
         /* ── Preview & Form ─────────────────────────────────────── */
         .preview-section { margin-top:1.5rem; display:none; }
@@ -163,97 +165,44 @@
             <p class="welcome__subtitle" id="userInfo">Memuat...</p>
         </section>
 
-        <!-- Panel Buat Final Report (eselon1 only) -->
+        <!-- Panel Laporan Tahunan (eselon1 only) -->
         <div id="generatePanel" style="display:none">
             <div class="generate-card">
                 <div class="card-title">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#2D9E3C">
                         <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
-                    Buat Final Report Baru
+                    Laporan Tahunan
                 </div>
 
-                <!-- Step 1: Pilih Periode -->
                 <div class="form-row">
                     <div class="f-field">
-                        <label>Bulan</label>
-                        <select id="genBulan">
-                            <option value="1">Januari</option><option value="2">Februari</option>
-                            <option value="3">Maret</option><option value="4">April</option>
-                            <option value="5">Mei</option><option value="6">Juni</option>
-                            <option value="7">Juli</option><option value="8">Agustus</option>
-                            <option value="9">September</option><option value="10">Oktober</option>
-                            <option value="11">November</option><option value="12">Desember</option>
+                        <label>Tahun</label>
+                        <select id="genTahun">
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
                         </select>
                     </div>
-                    <div class="f-field">
-                        <label>Tahun</label>
-                        <input type="number" id="genTahun" min="2024" max="2099" style="width:90px">
-                    </div>
-                    <button class="btn-preview" id="btnPreview" onclick="loadPreview()">Lihat Agregasi</button>
+                    <button class="btn-preview" id="btnPreview" onclick="loadAnnualSummary()">Lihat Agregasi</button>
                 </div>
 
-                <!-- Preview + Form Lengkap -->
                 <div class="preview-section" id="previewSection">
                     <hr class="divider">
                     <div style="font-size:.875rem; font-weight:700; color:var(--text-main); margin-bottom:1rem;" id="previewTitle"></div>
-
-                    <!-- Agregasi otomatis dari laporan yang approved -->
                     <div class="preview-grid" id="previewGrid"></div>
                     <div style="font-size:.8rem; color:#6B7280; margin-bottom:.5rem;">UPT tercakup:</div>
                     <div class="upt-chips" id="uptChips"></div>
                     <div id="noDataWarn"></div>
 
-                    <!-- Form tambahan -->
-                    <div id="extraForm">
-                        <hr class="divider">
-                        <div class="section-sub">C. Pengeluaran Tahun Sebelumnya (untuk perbandingan)</div>
-                        <div class="prev-year-grid">
-                            <div class="f-field">
-                                <label>Listrik Tahun Lalu (Rp)</label>
-                                <input type="number" id="listrikLalu" min="0" placeholder="0">
-                            </div>
-                            <div class="f-field">
-                                <label>Telepon Tahun Lalu (Rp)</label>
-                                <input type="number" id="teleponLalu" min="0" placeholder="0">
-                            </div>
-                            <div class="f-field">
-                                <label>Air Tahun Lalu (Rp)</label>
-                                <input type="number" id="airLalu" min="0" placeholder="0">
-                            </div>
-                        </div>
-
-                        <div class="section-sub">A &amp; B. Isian Naratif</div>
-                        <div style="display:grid; gap:.75rem; margin-bottom:1rem;">
-                            <div class="f-field">
-                                <label>A. Upaya Penghematan Yang Telah Dilakukan</label>
-                                <textarea id="upayaPenghematan" rows="3" placeholder="Contoh: Melakukan pemadaman lampu di ruangan yang tidak terpakai, sosialisasi hemat energi kepada seluruh pegawai, pemasangan timer otomatis pada AC..."></textarea>
-                            </div>
-                            <div class="f-field">
-                                <label>B. Kendala Yang Dihadapi</label>
-                                <textarea id="kendalaText" rows="3" placeholder="Contoh: Beberapa peralatan elektronik sudah tua dan boros energi, anggaran penggantian AC hemat energi belum tersedia..."></textarea>
-                            </div>
-                        </div>
-
-                        <div class="section-sub">Tanda Tangan</div>
-                        <div class="two-col">
-                            <div class="f-field">
-                                <label>Nama Pimpinan Unit Kerja</label>
-                                <input type="text" id="namaPimpinan" placeholder="Nama lengkap">
-                            </div>
-                            <div class="f-field">
-                                <label>NIP</label>
-                                <input type="text" id="nipPimpinan" placeholder="19XXXXXXXXXXXXXX">
-                            </div>
-                        </div>
-
-                        <div style="margin-top:1.5rem; display:flex; gap:.75rem; flex-wrap:wrap; align-items:center;">
-                            <button class="btn-submit-final" id="btnSubmitFinal" onclick="submitFinalReport()">
-                                Kirim Final Report ke Sekjen
-                            </button>
-                            <span style="font-size:.8rem; color:#9CA3AF;">Email otomatis akan dikirim ke Sekjen setelah submit.</span>
-                        </div>
+                    <div style="margin-top:1rem;">
+                        <button class="btn-annual-preview" id="btnAnnualPreview" onclick="openAnnualPreview()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;flex-shrink:0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Preview Laporan Tahunan
+                        </button>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -297,8 +246,6 @@
     document.getElementById('userInfo').textContent = (user.name || '') + ' — ' + (roleLabels[user.role] || user.role);
 
     const now = new Date();
-    const prevBulan = now.getMonth() === 0 ? 12 : now.getMonth();
-    document.getElementById('genBulan').value = prevBulan;
     document.getElementById('genTahun').value = now.getFullYear();
 
     if (user.role === 'eselon1') {
@@ -309,72 +256,66 @@
         document.getElementById('colUnit').style.display = '';
     }
 
-    // ── Preview agregasi ──────────────────────────────────────
     let previewData = null;
 
-    async function loadPreview() {
-        const bulan = document.getElementById('genBulan').value;
+    async function loadAnnualSummary() {
         const tahun = document.getElementById('genTahun').value;
         const btn   = document.getElementById('btnPreview');
         btn.disabled = true; btn.textContent = 'Memuat...';
 
         document.getElementById('previewSection').classList.remove('show');
-        document.getElementById('extraForm').style.display = 'none';
         previewData = null;
 
-        const body = new URLSearchParams({ action:'report.monthly.list', token:getToken() });
         try {
-            const res    = await fetch(AUTH_CONFIG.apiUrl, { method:'POST', body });
-            const result = await res.json();
+            const [result, uptResult] = await Promise.all([
+                fetch(AUTH_CONFIG.apiUrl, { method:'POST', body: new URLSearchParams({ action:'report.monthly.list', token:getToken(), limit:'500' }) }).then(r => r.json()),
+                fetch(AUTH_CONFIG.apiUrl, { method:'POST', body: new URLSearchParams({ action:'master.upt.list',    token:getToken()           }) }).then(r => r.json()).catch(() => ({}))
+            ]);
             if (!result.success) throw new Error(result.error);
 
+            const uptList = (uptResult.data && uptResult.data.list) || uptResult.list || [];
+            const uptMap  = {};
+            uptList.forEach(u => { if (u.kode) uptMap[String(u.kode).toUpperCase()] = u.nama || String(u.kode); });
+
             const reports = (result.data.reports || []).filter(r =>
-                r.status === 'approved' &&
-                String(r.bulan) === String(bulan) &&
-                String(r.tahun) === String(tahun)
+                r.status === 'approved' && String(r.tahun) === String(tahun)
             );
 
-            const bulanNama = NAMA_BULAN[parseInt(bulan)];
+            let totListrikKwh=0, totListrikHarga=0;
+            let totAirKubik=0,   totAirHarga=0;
+            let totTelJam=0,     totTelHarga=0;
+            const uptSet  = new Set();
+            const bulanSet = new Set();
+
+            reports.forEach(r => {
+                totListrikKwh   += parseFloat(r.listrik_kwh)   || 0;
+                totListrikHarga += parseFloat(r.listrik_harga) || 0;
+                totAirKubik     += parseFloat(r.air_kubik)     || 0;
+                totAirHarga     += parseFloat(r.air_harga)     || 0;
+                totTelJam       += parseFloat(r.telepon_jam)   || 0;
+                totTelHarga     += parseFloat(r.telepon_harga) || 0;
+                uptSet.add(String(r.upt_id));
+                bulanSet.add(parseInt(r.bulan));
+            });
+
+            const totBiaya = totListrikHarga + totAirHarga + totTelHarga;
+            previewData = { tahun, reports };
+
             document.getElementById('previewTitle').textContent =
-                'Agregasi ' + bulanNama + ' ' + tahun + ' — ' + reports.length + ' laporan disetujui';
+                'Agregasi Tahun ' + tahun + ' — ' + uptSet.size + ' UPT, ' + bulanSet.size + ' bulan';
 
             if (reports.length === 0) {
                 document.getElementById('previewGrid').innerHTML = '';
                 document.getElementById('uptChips').innerHTML    = '';
                 document.getElementById('noDataWarn').innerHTML  =
                     '<div style="background:#FEF3C7;border-radius:8px;padding:.75rem 1rem;color:#92400E;font-size:.875rem;margin-top:.5rem">' +
-                    '<strong>Belum ada laporan yang disetujui</strong><br>Pastikan laporan UPT periode ini sudah di-approve di halaman Approval.</div>';
+                    '<strong>Belum ada laporan yang disetujui untuk tahun ' + tahun + '</strong><br>' +
+                    'Pastikan laporan UPT sudah di-approve di halaman Approval.</div>';
                 document.getElementById('previewSection').classList.add('show');
                 return;
             }
 
             document.getElementById('noDataWarn').innerHTML = '';
-
-            let totListrikKwh=0, totListrikHarga=0;
-            let totAirKubik=0,   totAirHarga=0;
-            let totTelJam=0,     totTelHarga=0;
-            const uptList = [];
-
-            reports.forEach(r => {
-                totListrikKwh   += parseFloat(r.listrik_kwh)    || 0;
-                totListrikHarga += parseFloat(r.listrik_harga)  || 0;
-                totAirKubik     += parseFloat(r.air_kubik)      || 0;
-                totAirHarga     += parseFloat(r.air_harga)      || 0;
-                totTelJam       += parseFloat(r.telepon_jam)    || 0;
-                totTelHarga     += parseFloat(r.telepon_harga)  || 0;
-                uptList.push(String(r.upt_id));
-            });
-
-            const totHemat = totListrikHarga + totAirHarga + totTelHarga;
-
-            previewData = {
-                bulan, tahun, bulanNama,
-                totListrikKwh, totListrikHarga,
-                totAirKubik,   totAirHarga,
-                totTelJam,     totTelHarga,
-                totHemat,      uptList
-            };
-
             document.getElementById('previewGrid').innerHTML = `
                 <div class="pv-item">
                     <div class="pv-item__label">Listrik</div>
@@ -382,75 +323,36 @@
                     <div class="pv-item__sub">${fmtRp(totListrikHarga)}</div>
                 </div>
                 <div class="pv-item">
-                    <div class="pv-item__label">Telepon</div>
-                    <div class="pv-item__val">${fmtNum(totTelJam)} jam</div>
-                    <div class="pv-item__sub">${fmtRp(totTelHarga)}</div>
-                </div>
-                <div class="pv-item">
                     <div class="pv-item__label">Air</div>
                     <div class="pv-item__val">${fmtNum(totAirKubik)} m³</div>
                     <div class="pv-item__sub">${fmtRp(totAirHarga)}</div>
                 </div>
+                <div class="pv-item">
+                    <div class="pv-item__label">Telepon</div>
+                    <div class="pv-item__val">${fmtNum(totTelJam)} jam</div>
+                    <div class="pv-item__sub">${fmtRp(totTelHarga)}</div>
+                </div>
                 <div class="pv-item pv-item--hemat">
-                    <div class="pv-item__label">Total Pengeluaran</div>
-                    <div class="pv-item__val">${fmtRp(totHemat)}</div>
-                    <div class="pv-item__sub">${uptList.length} UPT</div>
+                    <div class="pv-item__label">Total Biaya</div>
+                    <div class="pv-item__val">${fmtRp(totBiaya)}</div>
+                    <div class="pv-item__sub">${uptSet.size} UPT · ${bulanSet.size} bulan</div>
                 </div>`;
 
-            document.getElementById('uptChips').innerHTML = uptList.map(u =>
-                `<span class="upt-chip">${escHtml(u)}</span>`).join('');
+            document.getElementById('uptChips').innerHTML = [...uptSet].map(u =>
+                `<span class="upt-chip">${escHtml(uptMap[u.toUpperCase()] || u)}</span>`).join('');
 
-            document.getElementById('extraForm').style.display = 'block';
             document.getElementById('previewSection').classList.add('show');
 
         } catch(err) {
-            showToast('Gagal memuat preview: ' + err.message, 'error');
+            showToast('Gagal memuat agregasi: ' + err.message, 'error');
         } finally {
             btn.disabled = false; btn.textContent = 'Lihat Agregasi';
         }
     }
 
-    async function submitFinalReport() {
-        if (!previewData) return;
-
-        const namaPimpinan = document.getElementById('namaPimpinan').value.trim();
-        const nipPimpinan  = document.getElementById('nipPimpinan').value.trim();
-        if (!namaPimpinan) { showToast('Nama pimpinan wajib diisi', 'error'); return; }
-        if (!nipPimpinan)  { showToast('NIP pimpinan wajib diisi', 'error'); return; }
-
-        if (!confirm('Kirim final report ' + previewData.bulanNama + ' ' + previewData.tahun +
-                     ' (' + previewData.uptList.length + ' UPT) ke Sekjen?')) return;
-
-        const btn = document.getElementById('btnSubmitFinal');
-        btn.disabled = true; btn.textContent = 'Mengirim...';
-
-        const body = new URLSearchParams({
-            action:               'report.final.create',
-            token:                getToken(),
-            bulan:                previewData.bulan,
-            tahun:                previewData.tahun,
-            listrik_harga_lalu:   document.getElementById('listrikLalu').value   || '0',
-            telepon_harga_lalu:   document.getElementById('teleponLalu').value   || '0',
-            air_harga_lalu:       document.getElementById('airLalu').value       || '0',
-            upaya_penghematan:    document.getElementById('upayaPenghematan').value,
-            kendala:              document.getElementById('kendalaText').value,
-            nama_pimpinan:        namaPimpinan,
-            nip_pimpinan:         nipPimpinan
-        });
-
-        try {
-            const res    = await fetch(AUTH_CONFIG.apiUrl, { method:'POST', body });
-            const result = await res.json();
-            if (!result.success) throw new Error(result.error);
-            showToast(result.data.message, 'success');
-            document.getElementById('previewSection').classList.remove('show');
-            previewData = null;
-            await loadFinalReports();
-        } catch(err) {
-            showToast('Gagal: ' + err.message, 'error');
-        } finally {
-            btn.disabled = false; btn.textContent = 'Kirim Final Report ke Sekjen';
-        }
+    function openAnnualPreview() {
+        const tahun = document.getElementById('genTahun').value;
+        window.open('preview-laporan.html?mode=annual&tahun=' + encodeURIComponent(tahun), '_blank');
     }
 
     // ── Daftar Final Report ───────────────────────────────────
@@ -617,9 +519,6 @@
         `;
 
         window.print();
-    }
-
-    // Helpers (escHtml, fmtNum, fmtRp, showToast, NAMA_BULAN) from utils.js
     }
 
     loadFinalReports();

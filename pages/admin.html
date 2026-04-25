@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,431 +20,849 @@
     <script src="../assets/js/utils.js"></script>
     <style>
         /* ── Tabs ───────────────────────────────────────────────── */
-        .tabs { display:flex; gap:.25rem; border-bottom:2px solid var(--border-color); margin-bottom:1.5rem; }
-        .tab-btn { padding:.65rem 1.25rem; border:none; background:transparent; font-size:.9rem; font-weight:600; color:#6B7280; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; border-radius:var(--radius-sm) var(--radius-sm) 0 0; transition:all .15s; }
-        .tab-btn:hover { color:var(--text-main); background:var(--surface-main); }
-        .tab-btn.active { color:var(--primary-main); border-bottom-color:var(--primary-main); }
-        .tab-panel { display:none; }
-        .tab-panel.active { display:block; }
+        .tabs {
+            display: flex;
+            gap: .25rem;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            padding: .65rem 1.25rem;
+            border: none;
+            background: transparent;
+            font-size: .9rem;
+            font-weight: 600;
+            color: #6B7280;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            transition: all .15s;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: var(--surface-main);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-main);
+            border-bottom-color: var(--primary-main);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
 
         /* ── Toolbar ────────────────────────────────────────────── */
-        .toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; flex-wrap:wrap; gap:.75rem; }
-        .toolbar input[type=search] { padding:.45rem .85rem; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:.875rem; width:240px; }
-        .btn-add { padding:.5rem 1.15rem; background:var(--primary-main); color:#fff; border:none; border-radius:var(--radius-sm); font-weight:700; cursor:pointer; font-size:.875rem; display:flex; align-items:center; gap:.4rem; }
-        .btn-add:hover { background:#2929CC; }
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: .75rem;
+        }
+
+        .toolbar input[type=search] {
+            padding: .45rem .85rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: .875rem;
+            width: 240px;
+        }
+
+        .btn-add {
+            padding: .5rem 1.15rem;
+            background: var(--primary-main);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+            font-size: .875rem;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        .btn-add:hover {
+            background: #2929CC;
+        }
 
         /* ── Table ──────────────────────────────────────────────── */
-        .table-card { background:#fff; border:1px solid var(--border-color); border-radius:var(--radius-lg); overflow:hidden; }
-        .table-wrap { overflow-x:auto; }
-        table { width:100%; border-collapse:collapse; font-size:.875rem; }
-        thead { background:var(--surface-main); }
-        thead th { padding:.8rem 1rem; text-align:left; font-weight:600; color:var(--text-main); opacity:.7; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; white-space:nowrap; }
-        tbody tr { border-top:1px solid var(--border-color); transition:background .12s; }
-        tbody tr:hover { background:#F8FBFF; }
-        tbody td { padding:.8rem 1rem; color:var(--text-main); vertical-align:middle; }
-        .text-muted { color:#9CA3AF; font-size:.8rem; }
+        .table-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .875rem;
+        }
+
+        thead {
+            background: var(--surface-main);
+        }
+
+        thead th {
+            padding: .8rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-main);
+            opacity: .7;
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-top: 1px solid var(--border-color);
+            transition: background .12s;
+        }
+
+        tbody tr:hover {
+            background: #F8FBFF;
+        }
+
+        tbody td {
+            padding: .8rem 1rem;
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+
+        .text-muted {
+            color: #9CA3AF;
+            font-size: .8rem;
+        }
 
         /* ── Badges ─────────────────────────────────────────────── */
-        .badge { display:inline-flex; padding:.2rem .6rem; border-radius:999px; font-size:.72rem; font-weight:700; }
-        .badge--active   { background:#D1FAE5; color:#065F46; }
-        .badge--inactive { background:#F3F4F6; color:#6B7280; }
-        .badge--locked   { background:#FEE2E2; color:#991B1B; }
-        .role-badge { display:inline-flex; padding:.2rem .6rem; border-radius:999px; font-size:.72rem; font-weight:700; }
-        .role-badge--upt_admin  { background:#EFF6FF; color:#1D4ED8; }
-        .role-badge--eselon1    { background:#F0FDF4; color:#166534; }
-        .role-badge--superadmin { background:#FEF3C7; color:#92400E; }
+        .badge {
+            display: inline-flex;
+            padding: .2rem .6rem;
+            border-radius: 999px;
+            font-size: .72rem;
+            font-weight: 700;
+        }
+
+        .badge--active {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge--inactive {
+            background: #F3F4F6;
+            color: #6B7280;
+        }
+
+        .badge--locked {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            padding: .2rem .6rem;
+            border-radius: 999px;
+            font-size: .72rem;
+            font-weight: 700;
+        }
+
+        .role-badge--upt_admin {
+            background: #EFF6FF;
+            color: #1D4ED8;
+        }
+
+        .role-badge--eselon1 {
+            background: #F0FDF4;
+            color: #166534;
+        }
+
+        .role-badge--superadmin {
+            background: #FEF3C7;
+            color: #92400E;
+        }
 
         /* ── Action buttons ─────────────────────────────────────── */
-        .btn-edit   { padding:.3rem .7rem; background:#fff; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:.78rem; font-weight:600; cursor:pointer; color:var(--text-main); }
-        .btn-edit:hover   { border-color:var(--primary-main); color:var(--primary-main); }
-        .btn-delete { padding:.3rem .7rem; background:#fff; border:1px solid #FCA5A5; border-radius:var(--radius-sm); font-size:.78rem; font-weight:600; cursor:pointer; color:#DC2626; }
-        .btn-delete:hover { background:#FEE2E2; }
-        .action-btns { display:flex; gap:.4rem; }
-        .state-box { padding:2.5rem; text-align:center; color:#9CA3AF; font-size:.875rem; }
+        .btn-edit {
+            padding: .3rem .7rem;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: .78rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        .btn-edit:hover {
+            border-color: var(--primary-main);
+            color: var(--primary-main);
+        }
+
+        .btn-delete {
+            padding: .3rem .7rem;
+            background: #fff;
+            border: 1px solid #FCA5A5;
+            border-radius: var(--radius-sm);
+            font-size: .78rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #DC2626;
+        }
+
+        .btn-delete:hover {
+            background: #FEE2E2;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: .4rem;
+        }
+
+        .state-box {
+            padding: 2.5rem;
+            text-align: center;
+            color: #9CA3AF;
+            font-size: .875rem;
+        }
 
         /* ── Modal ──────────────────────────────────────────────── */
-        .overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; z-index:1000; padding:1rem; }
-        .overlay.hidden { display:none; }
-        .modal { background:#fff; border-radius:var(--radius-lg); padding:2rem; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,.25); }
-        .modal-title { font-size:1.1rem; font-weight:700; color:var(--text-main); margin-bottom:1.5rem; }
-        .form-grid { display:grid; gap:.85rem; }
-        .form-grid.two-col { grid-template-columns:1fr 1fr; }
-        .f-field { display:flex; flex-direction:column; gap:.3rem; }
-        .f-field label { font-size:.75rem; font-weight:600; color:var(--text-main); opacity:.7; text-transform:uppercase; letter-spacing:.04em; }
-        .f-field input, .f-field select, .f-field textarea {
-            padding:.5rem .75rem; border:1px solid var(--border-color); border-radius:var(--radius-sm);
-            font-size:.875rem; color:var(--text-main); background:#fff; font-family:inherit;
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+            overscroll-behavior: contain;
         }
-        .f-field input:focus, .f-field select:focus { outline:none; border-color:var(--primary-main); box-shadow:0 0 0 3px rgba(10,61,92,.08); }
-        .f-hint { font-size:.72rem; color:#9CA3AF; }
-        .modal-actions { display:flex; justify-content:flex-end; gap:.75rem; margin-top:1.5rem; }
-        .btn-cancel { padding:.55rem 1.15rem; background:#F3F4F6; border:none; border-radius:var(--radius-sm); font-weight:600; cursor:pointer; color:var(--text-main); }
-        .btn-save   { padding:.55rem 1.4rem; background:var(--primary-main); color:#fff; border:none; border-radius:var(--radius-sm); font-weight:700; cursor:pointer; }
-        .btn-save:hover    { background:#2929CC; }
-        .btn-save:disabled { opacity:.5; cursor:not-allowed; }
-        .span-2 { grid-column:1/-1; }
+
+        .overlay.hidden {
+            display: none;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            width: 100%;
+            max-width: 1176px;
+            max-height: 90vh;
+            max-height: min(90vh, 90dvh);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25);
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: .85rem;
+        }
+
+        .form-grid.two-col {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .f-field {
+            display: flex;
+            flex-direction: column;
+            gap: .3rem;
+        }
+
+        .f-field label {
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--text-main);
+            opacity: .7;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+
+        .f-field input,
+        .f-field select,
+        .f-field textarea {
+            padding: .5rem .75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: .875rem;
+            color: var(--text-main);
+            background: #fff;
+            font-family: inherit;
+        }
+
+        .f-field input:focus,
+        .f-field select:focus {
+            outline: none;
+            border-color: var(--primary-main);
+            box-shadow: 0 0 0 3px rgba(10, 61, 92, .08);
+        }
+
+        .f-hint {
+            font-size: .72rem;
+            color: #9CA3AF;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: .75rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-cancel {
+            padding: .55rem 1.15rem;
+            background: #F3F4F6;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        .btn-save {
+            padding: .55rem 1.4rem;
+            background: var(--primary-main);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-save:hover {
+            background: #2929CC;
+        }
+
+        .btn-save:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .span-2 {
+            grid-column: 1/-1;
+        }
+
+        /* Mobile: single-column modal, safe-area aware */
+        @media (max-width:600px) {
+            .overlay {
+                align-items: flex-start;
+                padding: .5rem;
+                padding-top: max(.5rem, env(safe-area-inset-top, .5rem));
+                padding-bottom: max(.5rem, env(safe-area-inset-bottom, .5rem));
+            }
+
+            .modal {
+                margin-top: 100px;
+                margin-bottom: 100px;
+                padding: 1.25rem 1rem;
+                border-radius: 12px;
+                max-height: calc(100dvh - 1rem);
+                max-height: calc(100vh - 1rem);
+                /* fallback */
+            }
+
+            .form-grid.two-col {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-actions {
+                flex-wrap: wrap;
+            }
+
+            .modal-actions .btn-save,
+            .modal-actions .btn-cancel {
+                flex: 1;
+                text-align: center;
+            }
+        }
+
+        /* Tall-modal safeguard for short desktop screens */
+        @media (max-height:700px) {
+            .overlay {
+                align-items: flex-start;
+                padding-top: 1rem;
+            }
+
+            .modal {
+                max-height: calc(100vh - 2rem);
+            }
+        }
 
         /* ── Toast ──────────────────────────────────────────────── */
-        .toast { position:fixed; bottom:1.5rem; right:1.5rem; padding:.85rem 1.25rem; border-radius:var(--radius-md); font-size:.875rem; font-weight:600; color:#fff; z-index:2000; animation:slideUp .25s ease; max-width:340px; }
-        .toast--success { background:#2D9E3C; }
-        .toast--error   { background:#DC2626; }
-        @keyframes slideUp { from{transform:translateY(8px);opacity:0} to{transform:translateY(0);opacity:1} }
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            padding: .85rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-size: .875rem;
+            font-weight: 600;
+            color: #fff;
+            z-index: 2000;
+            animation: slideUp .25s ease;
+            max-width: 340px;
+        }
+
+        .toast--success {
+            background: #2D9E3C;
+        }
+
+        .toast--error {
+            background: #DC2626;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(8px);
+                opacity: 0
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1
+            }
+        }
 
         /* ── Reset PW button ─────────────────────────────────── */
-        .btn-reset { padding:.3rem .7rem; background:#fff; border:1px solid #D97706; border-radius:var(--radius-sm); font-size:.78rem; font-weight:600; cursor:pointer; color:#D97706; }
-        .btn-reset:hover { background:#FEF3C7; }
+        .btn-reset {
+            padding: .3rem .7rem;
+            background: #fff;
+            border: 1px solid #D97706;
+            border-radius: var(--radius-sm);
+            font-size: .78rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #D97706;
+        }
+
+        .btn-reset:hover {
+            background: #FEF3C7;
+        }
     </style>
 </head>
+
 <body>
-<div class="dashboard">
-    <header class="header">
-        <div class="header__brand">
-            <img src="../assets/img/logo.svg" class="header__logo" alt="GEMAR-KKP">
-            <span class="header__title">GEMAR-KKP</span>
-        </div>
-        <nav class="header__nav">
-            <a href="dashboard.html" class="header__link">Dashboard</a>
-            <a href="#" class="header__link header__link--active">Admin</a>
-            <button class="header__btn header__btn--logout" onclick="handleLogout()">Logout</button>
-        </nav>
-    </header>
-
-    <main class="main">
-        <section class="welcome">
-            <h1 class="welcome__title">Master Data</h1>
-            <p class="welcome__subtitle">Kelola pengguna, UPT, dan Eselon I</p>
-        </section>
-
-        <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('users',this)">Pengguna</button>
-            <button class="tab-btn" onclick="switchTab('upt',this)">UPT</button>
-            <button class="tab-btn" onclick="switchTab('eselon1',this)">Eselon I</button>
-        </div>
-
-        <!-- Tab: Users -->
-        <div class="tab-panel active" id="tab-users">
-            <div class="toolbar">
-                <input type="search" placeholder="Cari nama atau email..." oninput="filterTable('users-table',this.value)">
-                <button class="btn-add" onclick="openUserModal()">+ Tambah Pengguna</button>
+    <div class="dashboard">
+        <header class="header">
+            <div class="header__brand">
+                <img src="../assets/img/logo.svg" class="header__logo" alt="GEMAR-KKP">
+                <span class="header__title">GEMAR-KKP</span>
             </div>
-            <div class="table-card">
-                <div class="table-wrap">
-                    <table id="users-table">
-                        <thead><tr>
-                            <th>Email</th><th>Nama</th><th>Role</th>
-                            <th>UPT / Eselon I</th><th>Status</th><th>Aksi</th>
-                        </tr></thead>
-                        <tbody id="users-body"><tr><td colspan="6"><div class="state-box">Memuat...</div></td></tr></tbody>
-                    </table>
+            <nav class="header__nav">
+                <a href="dashboard.html" class="header__link">Dashboard</a>
+                <a href="#" class="header__link header__link--active">Admin</a>
+                <button class="header__btn header__btn--logout" onclick="handleLogout()">Logout</button>
+            </nav>
+        </header>
+
+        <main class="main">
+            <section class="welcome">
+                <h1 class="welcome__title">Master Data</h1>
+                <p class="welcome__subtitle">Kelola pengguna, UPT, dan Eselon I</p>
+            </section>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('users',this)">Pengguna</button>
+                <button class="tab-btn" onclick="switchTab('upt',this)">UPT</button>
+                <button class="tab-btn" onclick="switchTab('eselon1',this)">Eselon I</button>
+            </div>
+
+            <!-- Tab: Users -->
+            <div class="tab-panel active" id="tab-users">
+                <div class="toolbar">
+                    <input type="search" placeholder="Cari nama atau email..."
+                        oninput="filterTable('users-table',this.value)">
+                    <button class="btn-add" onclick="openUserModal()">+ Tambah Pengguna</button>
+                </div>
+                <div class="table-card">
+                    <div class="table-wrap">
+                        <table id="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Nama</th>
+                                    <th>Role</th>
+                                    <th>UPT / Eselon I</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-body">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="state-box">Memuat...</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Tab: UPT -->
-        <div class="tab-panel" id="tab-upt">
-            <div class="toolbar">
-                <input type="search" placeholder="Cari kode atau nama UPT..." oninput="filterTable('upt-table',this.value)">
-                <button class="btn-add" onclick="openUptModal()">+ Tambah UPT</button>
-            </div>
-            <div class="table-card">
-                <div class="table-wrap">
-                    <table id="upt-table">
-                        <thead><tr>
-                            <th>Kode</th><th>Nama UPT</th><th>Jenis</th>
-                            <th>Eselon I</th><th>Penanggung Jawab</th><th>Status</th><th>Aksi</th>
-                        </tr></thead>
-                        <tbody id="upt-body"><tr><td colspan="7"><div class="state-box">Memuat...</div></td></tr></tbody>
-                    </table>
+            <!-- Tab: UPT -->
+            <div class="tab-panel" id="tab-upt">
+                <div class="toolbar">
+                    <input type="search" placeholder="Cari kode atau nama UPT..."
+                        oninput="filterTable('upt-table',this.value)">
+                    <button class="btn-add" onclick="openUptModal()">+ Tambah UPT</button>
+                </div>
+                <div class="table-card">
+                    <div class="table-wrap">
+                        <table id="upt-table">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Nama UPT</th>
+                                    <th>Jenis</th>
+                                    <th>Eselon I</th>
+                                    <th>Penanggung Jawab</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="upt-body">
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="state-box">Memuat...</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Tab: Eselon I -->
-        <div class="tab-panel" id="tab-eselon1">
-            <div class="toolbar">
-                <input type="search" placeholder="Cari kode atau nama..." oninput="filterTable('eselon1-table',this.value)">
-                <button class="btn-add" onclick="openEselon1Modal()">+ Tambah Eselon I</button>
-            </div>
-            <div class="table-card">
-                <div class="table-wrap">
-                    <table id="eselon1-table">
-                        <thead><tr>
-                            <th>Kode</th><th>Nama</th><th>Singkatan</th>
-                            <th>Sekretaris</th><th>Email</th><th>Status</th><th>Aksi</th>
-                        </tr></thead>
-                        <tbody id="eselon1-body"><tr><td colspan="7"><div class="state-box">Memuat...</div></td></tr></tbody>
-                    </table>
+            <!-- Tab: Eselon I -->
+            <div class="tab-panel" id="tab-eselon1">
+                <div class="toolbar">
+                    <input type="search" placeholder="Cari kode atau nama..."
+                        oninput="filterTable('eselon1-table',this.value)">
+                    <button class="btn-add" onclick="openEselon1Modal()">+ Tambah Eselon I</button>
+                </div>
+                <div class="table-card">
+                    <div class="table-wrap">
+                        <table id="eselon1-table">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Nama</th>
+                                    <th>Singkatan</th>
+                                    <th>Sekretaris</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eselon1-body">
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="state-box">Memuat...</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
-</div>
+        </main>
+    </div>
 
-<!-- Modal User -->
-<div class="overlay hidden" id="userModal">
-    <div class="modal">
-        <div class="modal-title" id="userModalTitle">Tambah Pengguna</div>
-        <input type="hidden" id="userId">
-        <div class="form-grid two-col">
-            <div class="f-field span-2">
-                <label>Email</label>
-                <input type="email" id="uEmail" placeholder="nama@kkp.go.id">
+    <!-- Modal User -->
+    <div class="overlay hidden" id="userModal">
+        <div class="modal">
+            <div class="modal-title" id="userModalTitle">Tambah Pengguna</div>
+            <input type="hidden" id="userId">
+            <div class="form-grid two-col">
+                <div class="f-field span-2">
+                    <label>Email</label>
+                    <input type="email" id="uEmail" placeholder="nama@kkp.go.id">
+                </div>
+                <div class="f-field">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="uName" placeholder="Nama">
+                </div>
+                <div class="f-field">
+                    <label>Role</label>
+                    <select id="uRole" onchange="toggleRoleFields()">
+                        <option value="upt_admin">Admin UPT</option>
+                        <option value="eselon1">Sekretaris Ditjen/Badan</option>
+                        <option value="superadmin">Sekretaris Jenderal</option>
+                    </select>
+                </div>
+                <div class="f-field" id="fieldUpt">
+                    <label>Kode UPT</label>
+                    <select id="uUptId">
+                        <option value="">— Pilih UPT —</option>
+                    </select>
+                </div>
+                <div class="f-field" id="fieldEselon">
+                    <label>Kode Eselon I</label>
+                    <select id="uEselon1Id">
+                        <option value="">— Pilih Eselon I —</option>
+                    </select>
+                </div>
+                <div class="f-field">
+                    <label>Password <span id="pwHint" class="f-hint">(wajib untuk akun baru)</span></label>
+                    <input type="password" id="uPassword" placeholder="Min. 8 karakter" autocomplete="new-password">
+                </div>
+                <div class="f-field">
+                    <label>Status</label>
+                    <select id="uActive">
+                        <option value="true">Aktif</option>
+                        <option value="false">Nonaktif</option>
+                    </select>
+                </div>
+                <div class="f-field" id="fieldLocked" style="display:none">
+                    <label>Akun Terkunci</label>
+                    <select id="uLocked">
+                        <option value="false">Tidak Terkunci</option>
+                        <option value="true">Terkunci</option>
+                    </select>
+                </div>
             </div>
-            <div class="f-field">
-                <label>Nama Lengkap</label>
-                <input type="text" id="uName" placeholder="Nama">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('userModal')">Batal</button>
+                <button class="btn-save" id="btnSaveUser" onclick="saveUser()">Simpan</button>
             </div>
-            <div class="f-field">
-                <label>Role</label>
-                <select id="uRole" onchange="toggleRoleFields()">
-                    <option value="upt_admin">Admin UPT</option>
-                    <option value="eselon1">Sekretaris Ditjen/Badan</option>
-                    <option value="superadmin">Sekretaris Jenderal</option>
-                </select>
-            </div>
-            <div class="f-field" id="fieldUpt">
-                <label>Kode UPT</label>
-                <select id="uUptId"><option value="">— Pilih UPT —</option></select>
-            </div>
-            <div class="f-field" id="fieldEselon">
-                <label>Kode Eselon I</label>
-                <select id="uEselon1Id"><option value="">— Pilih Eselon I —</option></select>
-            </div>
-            <div class="f-field">
-                <label>Password <span id="pwHint" class="f-hint">(wajib untuk akun baru)</span></label>
-                <input type="password" id="uPassword" placeholder="Min. 8 karakter" autocomplete="new-password">
-            </div>
-            <div class="f-field">
-                <label>Status</label>
-                <select id="uActive">
-                    <option value="true">Aktif</option>
-                    <option value="false">Nonaktif</option>
-                </select>
-            </div>
-            <div class="f-field" id="fieldLocked" style="display:none">
-                <label>Akun Terkunci</label>
-                <select id="uLocked">
-                    <option value="false">Tidak Terkunci</option>
-                    <option value="true">Terkunci</option>
-                </select>
-            </div>
-        </div>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeModal('userModal')">Batal</button>
-            <button class="btn-save" id="btnSaveUser" onclick="saveUser()">Simpan</button>
         </div>
     </div>
-</div>
 
-<!-- Modal UPT -->
-<div class="overlay hidden" id="uptModal">
-    <div class="modal">
-        <div class="modal-title" id="uptModalTitle">Tambah UPT</div>
-        <input type="hidden" id="uptId">
-        <div class="form-grid two-col">
-            <div class="f-field">
-                <label>Kode UPT</label>
-                <input type="text" id="uptKode" placeholder="UPT001" style="text-transform:uppercase">
+    <!-- Modal UPT -->
+    <div class="overlay hidden" id="uptModal">
+        <div class="modal">
+            <div class="modal-title" id="uptModalTitle">Tambah UPT</div>
+            <input type="hidden" id="uptId">
+            <div class="form-grid two-col">
+                <div class="f-field">
+                    <label>Kode UPT</label>
+                    <input type="text" id="uptKode" placeholder="UPT001" style="text-transform:uppercase">
+                </div>
+                <div class="f-field">
+                    <label>Eselon I</label>
+                    <select id="uptEselon1Id">
+                        <option value="">— Pilih —</option>
+                    </select>
+                </div>
+                <div class="f-field span-2">
+                    <label>Nama UPT</label>
+                    <input type="text" id="uptNama" placeholder="Nama lengkap UPT">
+                </div>
+                <div class="f-field">
+                    <label>Jenis</label>
+                    <input type="text" id="uptJenis" placeholder="UPT / Satker / dll">
+                </div>
+                <div class="f-field">
+                    <label>Penanggung Jawab</label>
+                    <input type="text" id="uptPJ" placeholder="Nama">
+                </div>
+                <div class="f-field span-2">
+                    <label>Alamat</label>
+                    <input type="text" id="uptAlamat" placeholder="Alamat kantor">
+                </div>
+                <div class="f-field">
+                    <label>Telepon</label>
+                    <input type="text" id="uptTelepon" placeholder="021-xxxx">
+                </div>
+                <div class="f-field">
+                    <label>Status</label>
+                    <select id="uptActive">
+                        <option value="true">Aktif</option>
+                        <option value="false">Nonaktif</option>
+                    </select>
+                </div>
             </div>
-            <div class="f-field">
-                <label>Eselon I</label>
-                <select id="uptEselon1Id"><option value="">— Pilih —</option></select>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('uptModal')">Batal</button>
+                <button class="btn-save" id="btnSaveUpt" onclick="saveUpt()">Simpan</button>
             </div>
-            <div class="f-field span-2">
-                <label>Nama UPT</label>
-                <input type="text" id="uptNama" placeholder="Nama lengkap UPT">
-            </div>
-            <div class="f-field">
-                <label>Jenis</label>
-                <input type="text" id="uptJenis" placeholder="UPT / Satker / dll">
-            </div>
-            <div class="f-field">
-                <label>Penanggung Jawab</label>
-                <input type="text" id="uptPJ" placeholder="Nama">
-            </div>
-            <div class="f-field span-2">
-                <label>Alamat</label>
-                <input type="text" id="uptAlamat" placeholder="Alamat kantor">
-            </div>
-            <div class="f-field">
-                <label>Telepon</label>
-                <input type="text" id="uptTelepon" placeholder="021-xxxx">
-            </div>
-            <div class="f-field">
-                <label>Status</label>
-                <select id="uptActive">
-                    <option value="true">Aktif</option>
-                    <option value="false">Nonaktif</option>
-                </select>
-            </div>
-        </div>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeModal('uptModal')">Batal</button>
-            <button class="btn-save" id="btnSaveUpt" onclick="saveUpt()">Simpan</button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Eselon I -->
-<div class="overlay hidden" id="eselon1Modal">
-    <div class="modal">
-        <div class="modal-title" id="eselon1ModalTitle">Tambah Eselon I</div>
-        <input type="hidden" id="eselon1Id">
-        <div class="form-grid two-col">
-            <div class="f-field">
-                <label>Kode</label>
-                <input type="text" id="e1Kode" placeholder="ESL001" style="text-transform:uppercase">
-            </div>
-            <div class="f-field">
-                <label>Singkatan</label>
-                <input type="text" id="e1Singkat" placeholder="Ditjen PSDKP">
-            </div>
-            <div class="f-field span-2">
-                <label>Nama Lengkap</label>
-                <input type="text" id="e1Nama" placeholder="Direktorat Jenderal ...">
-            </div>
-            <div class="f-field">
-                <label>Jenis</label>
-                <input type="text" id="e1Jenis" placeholder="Ditjen / Badan / Biro">
-            </div>
-            <div class="f-field">
-                <label>Nama Sekretaris</label>
-                <input type="text" id="e1Sekretaris" placeholder="Nama sekretaris">
-            </div>
-            <div class="f-field">
-                <label>Telepon</label>
-                <input type="text" id="e1Telepon" placeholder="021-xxxx">
-            </div>
-            <div class="f-field">
-                <label>Email</label>
-                <input type="email" id="e1Email" placeholder="sekretariat@kkp.go.id">
-            </div>
-            <div class="f-field">
-                <label>Status</label>
-                <select id="e1Active">
-                    <option value="true">Aktif</option>
-                    <option value="false">Nonaktif</option>
-                </select>
-            </div>
-        </div>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeModal('eselon1Modal')">Batal</button>
-            <button class="btn-save" id="btnSaveEselon1" onclick="saveEselon1()">Simpan</button>
         </div>
     </div>
-</div>
 
-<!-- Modal Reset Password -->
-<div class="overlay hidden" id="resetPwModal">
-    <div class="modal">
-        <div class="modal-title">Reset Password Pengguna</div>
-        <div style="background:var(--surface-main);border-radius:var(--radius-sm);padding:.75rem 1rem;margin-bottom:1.25rem;">
-            <strong id="resetPwName" style="font-size:.9375rem;color:var(--text-main)">-</strong>
-            <div id="resetPwEmail" style="color:#6B7280;font-size:.8125rem;margin-top:.2rem"></div>
-        </div>
-        <div class="form-grid">
-            <div class="f-field">
-                <label>Password Baru</label>
-                <input type="password" id="resetPwNew" placeholder="Min. 8 karakter" autocomplete="new-password">
+    <!-- Modal Eselon I -->
+    <div class="overlay hidden" id="eselon1Modal">
+        <div class="modal">
+            <div class="modal-title" id="eselon1ModalTitle">Tambah Eselon I</div>
+            <input type="hidden" id="eselon1Id">
+            <div class="form-grid two-col">
+                <div class="f-field">
+                    <label>Kode</label>
+                    <input type="text" id="e1Kode" placeholder="ESL001" style="text-transform:uppercase">
+                </div>
+                <div class="f-field">
+                    <label>Singkatan</label>
+                    <input type="text" id="e1Singkat" placeholder="Ditjen PSDKP">
+                </div>
+                <div class="f-field span-2">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="e1Nama" placeholder="Direktorat Jenderal ...">
+                </div>
+                <div class="f-field">
+                    <label>Jenis</label>
+                    <input type="text" id="e1Jenis" placeholder="Ditjen / Badan / Biro">
+                </div>
+                <div class="f-field">
+                    <label>Nama Sekretaris</label>
+                    <input type="text" id="e1Sekretaris" placeholder="Nama sekretaris">
+                </div>
+                <div class="f-field">
+                    <label>Telepon</label>
+                    <input type="text" id="e1Telepon" placeholder="021-xxxx">
+                </div>
+                <div class="f-field">
+                    <label>Email</label>
+                    <input type="email" id="e1Email" placeholder="sekretariat@kkp.go.id">
+                </div>
+                <div class="f-field">
+                    <label>Status</label>
+                    <select id="e1Active">
+                        <option value="true">Aktif</option>
+                        <option value="false">Nonaktif</option>
+                    </select>
+                </div>
             </div>
-            <div class="f-field">
-                <label>Konfirmasi Password</label>
-                <input type="password" id="resetPwConfirm" placeholder="Ulangi password baru">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('eselon1Modal')">Batal</button>
+                <button class="btn-save" id="btnSaveEselon1" onclick="saveEselon1()">Simpan</button>
             </div>
-        </div>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeModal('resetPwModal')">Batal</button>
-            <button class="btn-save" id="btnResetPw" onclick="submitResetPassword()">Reset Password</button>
         </div>
     </div>
-</div>
 
-<script src="../assets/js/auth.js"></script>
-<script>
-const user = requireAuth();
-if (!user) throw new Error('redirect');
-if (user.role !== 'superadmin') window.location.href = 'dashboard.html';
+    <!-- Modal Reset Password -->
+    <div class="overlay hidden" id="resetPwModal">
+        <div class="modal">
+            <div class="modal-title">Reset Password Pengguna</div>
+            <div
+                style="background:var(--surface-main);border-radius:var(--radius-sm);padding:.75rem 1rem;margin-bottom:1.25rem;">
+                <strong id="resetPwName" style="font-size:.9375rem;color:var(--text-main)">-</strong>
+                <div id="resetPwEmail" style="color:#6B7280;font-size:.8125rem;margin-top:.2rem"></div>
+            </div>
+            <div class="form-grid">
+                <div class="f-field">
+                    <label>Password Baru</label>
+                    <input type="password" id="resetPwNew" placeholder="Min. 8 karakter" autocomplete="new-password">
+                </div>
+                <div class="f-field">
+                    <label>Konfirmasi Password</label>
+                    <input type="password" id="resetPwConfirm" placeholder="Ulangi password baru">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('resetPwModal')">Batal</button>
+                <button class="btn-save" id="btnResetPw" onclick="submitResetPassword()">Reset Password</button>
+            </div>
+        </div>
+    </div>
 
-// Cache data
-let allUsers = [], allUpt = [], allEselon1 = [];
+    <script src="../assets/js/auth.js"></script>
+    <script>
+        const user = requireAuth();
+        if (!user) throw new Error('redirect');
+        if (user.role !== 'superadmin') window.location.href = 'dashboard.html';
 
-// ── API helper ────────────────────────────────────────────
-async function api(params) {
-    params.token = getToken();
-    const res    = await fetch(AUTH_CONFIG.apiUrl, { method:'POST', body: new URLSearchParams(params) });
-    const result = await res.json();
-    if (!result.success) throw new Error(result.error || 'Gagal');
-    return result.data;
-}
+        // Cache data
+        let allUsers = [], allUpt = [], allEselon1 = [];
 
-// ── Tabs ──────────────────────────────────────────────────
-function switchTab(name, btn) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-' + name).classList.add('active');
-}
+        // ── API helper ────────────────────────────────────────────
+        async function api(params) {
+            params.token = getToken();
+            const res = await fetch(AUTH_CONFIG.apiUrl, { method: 'POST', body: new URLSearchParams(params) });
+            const result = await res.json();
+            if (!result.success) throw new Error(result.error || 'Gagal');
+            return result.data;
+        }
 
-// ── Filter table ──────────────────────────────────────────
-function filterTable(tableId, q) {
-    const rows = document.querySelectorAll('#' + tableId + ' tbody tr');
-    const lq   = q.toLowerCase();
-    rows.forEach(r => {
-        r.style.display = r.textContent.toLowerCase().includes(lq) ? '' : 'none';
-    });
-}
+        // ── Tabs ──────────────────────────────────────────────────
+        function switchTab(name, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + name).classList.add('active');
+        }
 
-// ── Modal helpers ─────────────────────────────────────────
-function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-document.querySelectorAll('.overlay').forEach(o => {
-    o.addEventListener('click', e => { if (e.target === o) o.classList.add('hidden'); });
-});
+        // ── Filter table ──────────────────────────────────────────
+        function filterTable(tableId, q) {
+            const rows = document.querySelectorAll('#' + tableId + ' tbody tr');
+            const lq = q.toLowerCase();
+            rows.forEach(r => {
+                r.style.display = r.textContent.toLowerCase().includes(lq) ? '' : 'none';
+            });
+        }
+
+        // ── Modal helpers ─────────────────────────────────────────
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        document.querySelectorAll('.overlay').forEach(o => {
+            o.addEventListener('click', e => { if (e.target === o) o.classList.add('hidden'); });
+        });
 
 
-// ── Load All Data ─────────────────────────────────────────
-async function loadAll() {
-    PageLoader.start('Memuat data master...');
-    try {
-        await Promise.all([loadUsers(), loadUpt(), loadEselon1()]);
-        populateSelects();
-        PageLoader.finish();
-    } catch(e) {
-        PageLoader.error('Gagal memuat data: ' + e.message, loadAll);
-    }
-}
+        // ── Load All Data ─────────────────────────────────────────
+        async function loadAll() {
+            PageLoader.start('Memuat data master...');
+            try {
+                await Promise.all([loadUsers(), loadUpt(), loadEselon1()]);
+                populateSelects();
+                PageLoader.finish();
+            } catch (e) {
+                PageLoader.error('Gagal memuat data: ' + e.message, loadAll);
+            }
+        }
 
-// ── USERS ─────────────────────────────────────────────────
-async function loadUsers() {
-    try {
-        const data = await api({ action:'master.user.list' });
-        allUsers = data.users || [];
-        renderUsers();
-    } catch(e) {
-        document.getElementById('users-body').innerHTML =
-            '<tr><td colspan="6"><div class="state-box">Gagal: '+e.message+'</div></td></tr>';
-    }
-}
+        // ── USERS ─────────────────────────────────────────────────
+        async function loadUsers() {
+            try {
+                const data = await api({ action: 'master.user.list' });
+                allUsers = data.users || [];
+                renderUsers();
+            } catch (e) {
+                document.getElementById('users-body').innerHTML =
+                    '<tr><td colspan="6"><div class="state-box">Gagal: ' + e.message + '</div></td></tr>';
+            }
+        }
 
-function renderUsers() {
-    const roleLabel = { upt_admin:'Admin UPT', eselon1:'Sekretaris Ditjen/Badan', superadmin:'Sekretaris Jenderal' };
-    const tbody = document.getElementById('users-body');
-    if (!allUsers.length) {
-        tbody.innerHTML = '<tr><td colspan="6"><div class="state-box">Belum ada pengguna.</div></td></tr>';
-        return;
-    }
-    tbody.innerHTML = allUsers.map(u => {
-        const statusBadge = u.locked == true || u.locked === 'TRUE'
-            ? '<span class="badge badge--locked">Terkunci</span>'
-            : (u.active == false || u.active === 'FALSE'
-                ? '<span class="badge badge--inactive">Nonaktif</span>'
-                : '<span class="badge badge--active">Aktif</span>');
-        const assoc = u.role === 'upt_admin' ? (u.upt_id || '—')
-                    : u.role === 'eselon1'   ? (u.eselon1_id || '—') : '—';
-        return `<tr>
+        function renderUsers() {
+            const roleLabel = { upt_admin: 'Admin UPT', eselon1: 'Sekretaris Ditjen/Badan', superadmin: 'Sekretaris Jenderal' };
+            const tbody = document.getElementById('users-body');
+            if (!allUsers.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="state-box">Belum ada pengguna.</div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = allUsers.map(u => {
+                const statusBadge = u.locked == true || u.locked === 'TRUE'
+                    ? '<span class="badge badge--locked">Terkunci</span>'
+                    : (u.active == false || u.active === 'FALSE'
+                        ? '<span class="badge badge--inactive">Nonaktif</span>'
+                        : '<span class="badge badge--active">Aktif</span>');
+                const assoc = u.role === 'upt_admin' ? (u.upt_id || '—')
+                    : u.role === 'eselon1' ? (u.eselon1_id || '—') : '—';
+                return `<tr>
             <td>${escHtml(u.email)}</td>
             <td>${escHtml(u.name)}</td>
-            <td><span class="role-badge role-badge--${u.role}">${escHtml(roleLabel[u.role]||u.role)}</span></td>
+            <td><span class="role-badge role-badge--${u.role}">${escHtml(roleLabel[u.role] || u.role)}</span></td>
             <td class="text-muted">${escHtml(assoc)}</td>
             <td>${statusBadge}</td>
             <td><div class="action-btns">
@@ -452,295 +871,296 @@ function renderUsers() {
                 <button class="btn-delete" onclick="deleteUser('${escHtml(String(u.id))}','${escHtml(u.name)}')">Nonaktifkan</button>
             </div></td>
         </tr>`;
-    }).join('');
-}
+            }).join('');
+        }
 
-function toggleRoleFields() {
-    const role = document.getElementById('uRole').value;
-    document.getElementById('fieldUpt').style.display    = role === 'upt_admin' ? '' : 'none';
-    document.getElementById('fieldEselon').style.display = (role === 'upt_admin' || role === 'eselon1') ? '' : 'none';
-}
+        function toggleRoleFields() {
+            const role = document.getElementById('uRole').value;
+            document.getElementById('fieldUpt').style.display = role === 'upt_admin' ? '' : 'none';
+            document.getElementById('fieldEselon').style.display = (role === 'upt_admin' || role === 'eselon1') ? '' : 'none';
+        }
 
-function openUserModal(u) {
-    const isEdit = !!u;
-    document.getElementById('userModalTitle').textContent = isEdit ? 'Edit Pengguna' : 'Tambah Pengguna';
-    document.getElementById('userId').value    = isEdit ? u.id    : '';
-    document.getElementById('uEmail').value    = isEdit ? u.email : '';
-    document.getElementById('uName').value     = isEdit ? u.name  : '';
-    document.getElementById('uRole').value     = isEdit ? u.role  : 'upt_admin';
-    document.getElementById('uUptId').value    = isEdit ? (u.upt_id||'')     : '';
-    document.getElementById('uEselon1Id').value= isEdit ? (u.eselon1_id||'') : '';
-    document.getElementById('uPassword').value = '';
-    document.getElementById('uActive').value   = isEdit ? String(u.active)   : 'true';
-    document.getElementById('uLocked').value   = isEdit ? String(u.locked)   : 'false';
-    document.getElementById('uEmail').disabled = isEdit;
-    document.getElementById('pwHint').textContent = isEdit ? '(kosongkan untuk tidak mengubah)' : '(wajib untuk akun baru)';
-    document.getElementById('fieldLocked').style.display = isEdit ? '' : 'none';
-    toggleRoleFields();
-    document.getElementById('userModal').classList.remove('hidden');
-}
+        function openUserModal(u) {
+            const isEdit = !!u;
+            document.getElementById('userModalTitle').textContent = isEdit ? 'Edit Pengguna' : 'Tambah Pengguna';
+            document.getElementById('userId').value = isEdit ? u.id : '';
+            document.getElementById('uEmail').value = isEdit ? u.email : '';
+            document.getElementById('uName').value = isEdit ? u.name : '';
+            document.getElementById('uRole').value = isEdit ? u.role : 'upt_admin';
+            document.getElementById('uUptId').value = isEdit ? (u.upt_id || '') : '';
+            document.getElementById('uEselon1Id').value = isEdit ? (u.eselon1_id || '') : '';
+            document.getElementById('uPassword').value = '';
+            document.getElementById('uActive').value = isEdit ? String(u.active) : 'true';
+            document.getElementById('uLocked').value = isEdit ? String(u.locked) : 'false';
+            document.getElementById('uEmail').disabled = isEdit;
+            document.getElementById('pwHint').textContent = isEdit ? '(kosongkan untuk tidak mengubah)' : '(wajib untuk akun baru)';
+            document.getElementById('fieldLocked').style.display = isEdit ? '' : 'none';
+            toggleRoleFields();
+            document.getElementById('userModal').classList.remove('hidden');
+        }
 
-async function saveUser() {
-    const id  = document.getElementById('userId').value;
-    const btn = document.getElementById('btnSaveUser');
-    btn.disabled = true; btn.textContent = 'Menyimpan...';
+        async function saveUser() {
+            const id = document.getElementById('userId').value;
+            const btn = document.getElementById('btnSaveUser');
+            btn.disabled = true; btn.textContent = 'Menyimpan...';
 
-    const params = {
-        action:       id ? 'master.user.update' : 'master.user.create',
-        email:        document.getElementById('uEmail').value,
-        name:         document.getElementById('uName').value,
-        role:         document.getElementById('uRole').value,
-        upt_id:       document.getElementById('uUptId').value,
-        eselon1_id:   document.getElementById('uEselon1Id').value,
-        password:     document.getElementById('uPassword').value,
-        active:       document.getElementById('uActive').value,
-        locked:       document.getElementById('uLocked').value
-    };
-    if (id) params.target_id = id;
+            const params = {
+                action: id ? 'master.user.update' : 'master.user.create',
+                email: document.getElementById('uEmail').value,
+                name: document.getElementById('uName').value,
+                role: document.getElementById('uRole').value,
+                upt_id: document.getElementById('uUptId').value,
+                eselon1_id: document.getElementById('uEselon1Id').value,
+                password: document.getElementById('uPassword').value,
+                active: document.getElementById('uActive').value,
+                locked: document.getElementById('uLocked').value
+            };
+            if (id) params.target_id = id;
 
-    try {
-        const data = await api(params);
-        showToast(data.message, 'success');
-        closeModal('userModal');
-        await loadUsers();
-    } catch(e) {
-        showToast(e.message, 'error');
-    } finally {
-        btn.disabled = false; btn.textContent = 'Simpan';
-    }
-}
+            try {
+                const data = await api(params);
+                showToast(data.message, 'success');
+                closeModal('userModal');
+                await loadUsers();
+            } catch (e) {
+                showToast(e.message, 'error');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Simpan';
+            }
+        }
 
-async function deleteUser(id, name) {
-    if (!confirm('Nonaktifkan pengguna "' + name + '"?')) return;
-    try {
-        const data = await api({ action:'master.user.delete', target_id:id });
-        showToast(data.message, 'success');
-        await loadUsers();
-    } catch(e) { showToast(e.message, 'error'); }
-}
+        async function deleteUser(id, name) {
+            if (!confirm('Nonaktifkan pengguna "' + name + '"?')) return;
+            try {
+                const data = await api({ action: 'master.user.delete', target_id: id });
+                showToast(data.message, 'success');
+                await loadUsers();
+            } catch (e) { showToast(e.message, 'error'); }
+        }
 
-// ── UPT ──────────────────────────────────────────────────
-async function loadUpt() {
-    try {
-        const data = await api({ action:'master.upt.list' });
-        allUpt = data.list || [];
-        renderUpt();
-    } catch(e) {
-        document.getElementById('upt-body').innerHTML =
-            '<tr><td colspan="7"><div class="state-box">Gagal: '+e.message+'</div></td></tr>';
-    }
-}
+        // ── UPT ──────────────────────────────────────────────────
+        async function loadUpt() {
+            try {
+                const data = await api({ action: 'master.upt.list' });
+                allUpt = data.list || [];
+                renderUpt();
+            } catch (e) {
+                document.getElementById('upt-body').innerHTML =
+                    '<tr><td colspan="7"><div class="state-box">Gagal: ' + e.message + '</div></td></tr>';
+            }
+        }
 
-function renderUpt() {
-    const tbody = document.getElementById('upt-body');
-    if (!allUpt.length) {
-        tbody.innerHTML = '<tr><td colspan="7"><div class="state-box">Belum ada UPT.</div></td></tr>';
-        return;
-    }
-    tbody.innerHTML = allUpt.map(u => `<tr>
+        function renderUpt() {
+            const tbody = document.getElementById('upt-body');
+            if (!allUpt.length) {
+                tbody.innerHTML = '<tr><td colspan="7"><div class="state-box">Belum ada UPT.</div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = allUpt.map(u => `<tr>
         <td><strong>${escHtml(u.kode)}</strong></td>
         <td>${escHtml(u.nama)}</td>
-        <td class="text-muted">${escHtml(u.jenis||'—')}</td>
-        <td class="text-muted">${escHtml(u.eselon1_id||'—')}</td>
-        <td class="text-muted">${escHtml(u.penanggung_jawab||'—')}</td>
-        <td>${u.active==false||u.active==='FALSE'?'<span class="badge badge--inactive">Nonaktif</span>':'<span class="badge badge--active">Aktif</span>'}</td>
+        <td class="text-muted">${escHtml(u.jenis || '—')}</td>
+        <td class="text-muted">${escHtml(u.eselon1_id || '—')}</td>
+        <td class="text-muted">${escHtml(u.penanggung_jawab || '—')}</td>
+        <td>${u.active == false || u.active === 'FALSE' ? '<span class="badge badge--inactive">Nonaktif</span>' : '<span class="badge badge--active">Aktif</span>'}</td>
         <td><div class="action-btns">
             <button class="btn-edit" onclick='openUptModal(${escHtml(JSON.stringify(u))})'>Edit</button>
             <button class="btn-delete" onclick="deleteUpt('${escHtml(String(u.id))}','${escHtml(u.kode)}')">Nonaktifkan</button>
         </div></td>
     </tr>`).join('');
-}
+        }
 
-function openUptModal(u) {
-    const isEdit = !!u;
-    document.getElementById('uptModalTitle').textContent = isEdit ? 'Edit UPT' : 'Tambah UPT';
-    document.getElementById('uptId').value       = isEdit ? u.id             : '';
-    document.getElementById('uptKode').value     = isEdit ? u.kode           : '';
-    document.getElementById('uptKode').disabled  = isEdit;
-    document.getElementById('uptNama').value     = isEdit ? u.nama           : '';
-    document.getElementById('uptJenis').value    = isEdit ? (u.jenis||'')    : '';
-    document.getElementById('uptEselon1Id').value= isEdit ? (u.eselon1_id||''):'';
-    document.getElementById('uptAlamat').value   = isEdit ? (u.alamat||'')   : '';
-    document.getElementById('uptPJ').value       = isEdit ? (u.penanggung_jawab||''):'';
-    document.getElementById('uptTelepon').value  = isEdit ? (u.telepon||'')  : '';
-    document.getElementById('uptActive').value   = isEdit ? String(u.active) : 'true';
-    document.getElementById('uptModal').classList.remove('hidden');
-}
+        function openUptModal(u) {
+            const isEdit = !!u;
+            document.getElementById('uptModalTitle').textContent = isEdit ? 'Edit UPT' : 'Tambah UPT';
+            document.getElementById('uptId').value = isEdit ? u.id : '';
+            document.getElementById('uptKode').value = isEdit ? u.kode : '';
+            document.getElementById('uptKode').disabled = isEdit;
+            document.getElementById('uptNama').value = isEdit ? u.nama : '';
+            document.getElementById('uptJenis').value = isEdit ? (u.jenis || '') : '';
+            document.getElementById('uptEselon1Id').value = isEdit ? (u.eselon1_id || '') : '';
+            document.getElementById('uptAlamat').value = isEdit ? (u.alamat || '') : '';
+            document.getElementById('uptPJ').value = isEdit ? (u.penanggung_jawab || '') : '';
+            document.getElementById('uptTelepon').value = isEdit ? (u.telepon || '') : '';
+            document.getElementById('uptActive').value = isEdit ? String(u.active) : 'true';
+            document.getElementById('uptModal').classList.remove('hidden');
+        }
 
-async function saveUpt() {
-    const id  = document.getElementById('uptId').value;
-    const btn = document.getElementById('btnSaveUpt');
-    btn.disabled = true; btn.textContent = 'Menyimpan...';
-    const params = {
-        action:          id ? 'master.upt.update' : 'master.upt.create',
-        kode:            document.getElementById('uptKode').value.toUpperCase(),
-        nama:            document.getElementById('uptNama').value,
-        jenis:           document.getElementById('uptJenis').value,
-        eselon1_id:      document.getElementById('uptEselon1Id').value,
-        alamat:          document.getElementById('uptAlamat').value,
-        penanggung_jawab:document.getElementById('uptPJ').value,
-        telepon:         document.getElementById('uptTelepon').value,
-        active:          document.getElementById('uptActive').value
-    };
-    if (id) params.target_id = id;
-    try {
-        const data = await api(params);
-        showToast(data.message, 'success');
-        closeModal('uptModal');
-        await loadUpt();
-        populateSelects();
-    } catch(e) { showToast(e.message, 'error'); }
-    finally { btn.disabled=false; btn.textContent='Simpan'; }
-}
+        async function saveUpt() {
+            const id = document.getElementById('uptId').value;
+            const btn = document.getElementById('btnSaveUpt');
+            btn.disabled = true; btn.textContent = 'Menyimpan...';
+            const params = {
+                action: id ? 'master.upt.update' : 'master.upt.create',
+                kode: document.getElementById('uptKode').value.toUpperCase(),
+                nama: document.getElementById('uptNama').value,
+                jenis: document.getElementById('uptJenis').value,
+                eselon1_id: document.getElementById('uptEselon1Id').value,
+                alamat: document.getElementById('uptAlamat').value,
+                penanggung_jawab: document.getElementById('uptPJ').value,
+                telepon: document.getElementById('uptTelepon').value,
+                active: document.getElementById('uptActive').value
+            };
+            if (id) params.target_id = id;
+            try {
+                const data = await api(params);
+                showToast(data.message, 'success');
+                closeModal('uptModal');
+                await loadUpt();
+                populateSelects();
+            } catch (e) { showToast(e.message, 'error'); }
+            finally { btn.disabled = false; btn.textContent = 'Simpan'; }
+        }
 
-async function deleteUpt(id, kode) {
-    if (!confirm('Nonaktifkan UPT "' + kode + '"?')) return;
-    try {
-        const data = await api({ action:'master.upt.delete', target_id:id });
-        showToast(data.message, 'success');
-        await loadUpt();
-    } catch(e) { showToast(e.message, 'error'); }
-}
+        async function deleteUpt(id, kode) {
+            if (!confirm('Nonaktifkan UPT "' + kode + '"?')) return;
+            try {
+                const data = await api({ action: 'master.upt.delete', target_id: id });
+                showToast(data.message, 'success');
+                await loadUpt();
+            } catch (e) { showToast(e.message, 'error'); }
+        }
 
-// ── ESELON I ─────────────────────────────────────────────
-async function loadEselon1() {
-    try {
-        const data = await api({ action:'master.eselon1.list' });
-        allEselon1 = data.list || [];
-        renderEselon1();
-    } catch(e) {
-        document.getElementById('eselon1-body').innerHTML =
-            '<tr><td colspan="7"><div class="state-box">Gagal: '+e.message+'</div></td></tr>';
-    }
-}
+        // ── ESELON I ─────────────────────────────────────────────
+        async function loadEselon1() {
+            try {
+                const data = await api({ action: 'master.eselon1.list' });
+                allEselon1 = data.list || [];
+                renderEselon1();
+            } catch (e) {
+                document.getElementById('eselon1-body').innerHTML =
+                    '<tr><td colspan="7"><div class="state-box">Gagal: ' + e.message + '</div></td></tr>';
+            }
+        }
 
-function renderEselon1() {
-    const tbody = document.getElementById('eselon1-body');
-    if (!allEselon1.length) {
-        tbody.innerHTML = '<tr><td colspan="7"><div class="state-box">Belum ada Eselon I.</div></td></tr>';
-        return;
-    }
-    tbody.innerHTML = allEselon1.map(e => `<tr>
+        function renderEselon1() {
+            const tbody = document.getElementById('eselon1-body');
+            if (!allEselon1.length) {
+                tbody.innerHTML = '<tr><td colspan="7"><div class="state-box">Belum ada Eselon I.</div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = allEselon1.map(e => `<tr>
         <td><strong>${escHtml(e.kode)}</strong></td>
         <td>${escHtml(e.nama)}</td>
-        <td class="text-muted">${escHtml(e.singkat||'—')}</td>
-        <td class="text-muted">${escHtml(e.sekretaris||'—')}</td>
-        <td class="text-muted">${escHtml(e.email||'—')}</td>
-        <td>${e.active==false||e.active==='FALSE'?'<span class="badge badge--inactive">Nonaktif</span>':'<span class="badge badge--active">Aktif</span>'}</td>
+        <td class="text-muted">${escHtml(e.singkat || '—')}</td>
+        <td class="text-muted">${escHtml(e.sekretaris || '—')}</td>
+        <td class="text-muted">${escHtml(e.email || '—')}</td>
+        <td>${e.active == false || e.active === 'FALSE' ? '<span class="badge badge--inactive">Nonaktif</span>' : '<span class="badge badge--active">Aktif</span>'}</td>
         <td><div class="action-btns">
             <button class="btn-edit" onclick='openEselon1Modal(${escHtml(JSON.stringify(e))})'>Edit</button>
             <button class="btn-delete" onclick="deleteEselon1('${escHtml(String(e.id))}','${escHtml(e.kode)}')">Nonaktifkan</button>
         </div></td>
     </tr>`).join('');
-}
+        }
 
-function openEselon1Modal(e) {
-    const isEdit = !!e;
-    document.getElementById('eselon1ModalTitle').textContent = isEdit ? 'Edit Eselon I' : 'Tambah Eselon I';
-    document.getElementById('eselon1Id').value  = isEdit ? e.id              : '';
-    document.getElementById('e1Kode').value     = isEdit ? e.kode            : '';
-    document.getElementById('e1Kode').disabled  = isEdit;
-    document.getElementById('e1Nama').value     = isEdit ? e.nama            : '';
-    document.getElementById('e1Singkat').value  = isEdit ? (e.singkat||'')   : '';
-    document.getElementById('e1Jenis').value    = isEdit ? (e.jenis||'')     : '';
-    document.getElementById('e1Sekretaris').value=isEdit ? (e.sekretaris||''): '';
-    document.getElementById('e1Telepon').value  = isEdit ? (e.telepon||'')   : '';
-    document.getElementById('e1Email').value    = isEdit ? (e.email||'')     : '';
-    document.getElementById('e1Active').value   = isEdit ? String(e.active)  : 'true';
-    document.getElementById('eselon1Modal').classList.remove('hidden');
-}
+        function openEselon1Modal(e) {
+            const isEdit = !!e;
+            document.getElementById('eselon1ModalTitle').textContent = isEdit ? 'Edit Eselon I' : 'Tambah Eselon I';
+            document.getElementById('eselon1Id').value = isEdit ? e.id : '';
+            document.getElementById('e1Kode').value = isEdit ? e.kode : '';
+            document.getElementById('e1Kode').disabled = isEdit;
+            document.getElementById('e1Nama').value = isEdit ? e.nama : '';
+            document.getElementById('e1Singkat').value = isEdit ? (e.singkat || '') : '';
+            document.getElementById('e1Jenis').value = isEdit ? (e.jenis || '') : '';
+            document.getElementById('e1Sekretaris').value = isEdit ? (e.sekretaris || '') : '';
+            document.getElementById('e1Telepon').value = isEdit ? (e.telepon || '') : '';
+            document.getElementById('e1Email').value = isEdit ? (e.email || '') : '';
+            document.getElementById('e1Active').value = isEdit ? String(e.active) : 'true';
+            document.getElementById('eselon1Modal').classList.remove('hidden');
+        }
 
-async function saveEselon1() {
-    const id  = document.getElementById('eselon1Id').value;
-    const btn = document.getElementById('btnSaveEselon1');
-    btn.disabled=true; btn.textContent='Menyimpan...';
-    const params = {
-        action:     id ? 'master.eselon1.update' : 'master.eselon1.create',
-        kode:       document.getElementById('e1Kode').value.toUpperCase(),
-        nama:       document.getElementById('e1Nama').value,
-        singkat:    document.getElementById('e1Singkat').value,
-        jenis:      document.getElementById('e1Jenis').value,
-        sekretaris: document.getElementById('e1Sekretaris').value,
-        telepon:    document.getElementById('e1Telepon').value,
-        email:      document.getElementById('e1Email').value,
-        active:     document.getElementById('e1Active').value
-    };
-    if (id) params.target_id = id;
-    try {
-        const data = await api(params);
-        showToast(data.message, 'success');
-        closeModal('eselon1Modal');
-        await loadEselon1();
-        populateSelects();
-    } catch(e) { showToast(e.message, 'error'); }
-    finally { btn.disabled=false; btn.textContent='Simpan'; }
-}
+        async function saveEselon1() {
+            const id = document.getElementById('eselon1Id').value;
+            const btn = document.getElementById('btnSaveEselon1');
+            btn.disabled = true; btn.textContent = 'Menyimpan...';
+            const params = {
+                action: id ? 'master.eselon1.update' : 'master.eselon1.create',
+                kode: document.getElementById('e1Kode').value.toUpperCase(),
+                nama: document.getElementById('e1Nama').value,
+                singkat: document.getElementById('e1Singkat').value,
+                jenis: document.getElementById('e1Jenis').value,
+                sekretaris: document.getElementById('e1Sekretaris').value,
+                telepon: document.getElementById('e1Telepon').value,
+                email: document.getElementById('e1Email').value,
+                active: document.getElementById('e1Active').value
+            };
+            if (id) params.target_id = id;
+            try {
+                const data = await api(params);
+                showToast(data.message, 'success');
+                closeModal('eselon1Modal');
+                await loadEselon1();
+                populateSelects();
+            } catch (e) { showToast(e.message, 'error'); }
+            finally { btn.disabled = false; btn.textContent = 'Simpan'; }
+        }
 
-async function deleteEselon1(id, kode) {
-    if (!confirm('Nonaktifkan Eselon I "' + kode + '"?')) return;
-    try {
-        const data = await api({ action:'master.eselon1.delete', target_id:id });
-        showToast(data.message, 'success');
-        await loadEselon1();
-    } catch(e) { showToast(e.message, 'error'); }
-}
+        async function deleteEselon1(id, kode) {
+            if (!confirm('Nonaktifkan Eselon I "' + kode + '"?')) return;
+            try {
+                const data = await api({ action: 'master.eselon1.delete', target_id: id });
+                showToast(data.message, 'success');
+                await loadEselon1();
+            } catch (e) { showToast(e.message, 'error'); }
+        }
 
-// ── Populate select dropdowns ─────────────────────────────
-function populateSelects() {
-    // UPT select di form user
-    const uptSel = document.getElementById('uUptId');
-    const curUpt = uptSel.value;
-    uptSel.innerHTML = '<option value="">— Pilih UPT —</option>' +
-        allUpt.filter(u => u.active != false && u.active !== 'FALSE')
-              .map(u => `<option value="${escHtml(u.kode)}">${escHtml(u.kode)} — ${escHtml(u.nama)}</option>`).join('');
-    uptSel.value = curUpt;
+        // ── Populate select dropdowns ─────────────────────────────
+        function populateSelects() {
+            // UPT select di form user
+            const uptSel = document.getElementById('uUptId');
+            const curUpt = uptSel.value;
+            uptSel.innerHTML = '<option value="">— Pilih UPT —</option>' +
+                allUpt.filter(u => u.active != false && u.active !== 'FALSE')
+                    .map(u => `<option value="${escHtml(u.kode)}">${escHtml(u.kode)} — ${escHtml(u.nama)}</option>`).join('');
+            uptSel.value = curUpt;
 
-    // Eselon I select di form user & UPT
-    const opts = '<option value="">— Pilih Eselon I —</option>' +
-        allEselon1.filter(e => e.active != false && e.active !== 'FALSE')
-                  .map(e => `<option value="${escHtml(e.kode)}">${escHtml(e.kode)} — ${escHtml(e.singkat||e.nama)}</option>`).join('');
+            // Eselon I select di form user & UPT
+            const opts = '<option value="">— Pilih Eselon I —</option>' +
+                allEselon1.filter(e => e.active != false && e.active !== 'FALSE')
+                    .map(e => `<option value="${escHtml(e.kode)}">${escHtml(e.kode)} — ${escHtml(e.singkat || e.nama)}</option>`).join('');
 
-    ['uEselon1Id','uptEselon1Id'].forEach(id => {
-        const sel = document.getElementById(id);
-        const cur = sel.value;
-        sel.innerHTML = opts;
-        sel.value = cur;
-    });
-}
+            ['uEselon1Id', 'uptEselon1Id'].forEach(id => {
+                const sel = document.getElementById(id);
+                const cur = sel.value;
+                sel.innerHTML = opts;
+                sel.value = cur;
+            });
+        }
 
-// ── Reset Password ────────────────────────────────────────
-let resetPwTargetId = null;
+        // ── Reset Password ────────────────────────────────────────
+        let resetPwTargetId = null;
 
-function openResetPasswordModal(userId, userName, email) {
-    resetPwTargetId = userId;
-    document.getElementById('resetPwName').textContent  = userName;
-    document.getElementById('resetPwEmail').textContent = email;
-    document.getElementById('resetPwNew').value     = '';
-    document.getElementById('resetPwConfirm').value = '';
-    document.getElementById('resetPwModal').classList.remove('hidden');
-    setTimeout(() => document.getElementById('resetPwNew').focus(), 50);
-}
+        function openResetPasswordModal(userId, userName, email) {
+            resetPwTargetId = userId;
+            document.getElementById('resetPwName').textContent = userName;
+            document.getElementById('resetPwEmail').textContent = email;
+            document.getElementById('resetPwNew').value = '';
+            document.getElementById('resetPwConfirm').value = '';
+            document.getElementById('resetPwModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('resetPwNew').focus(), 50);
+        }
 
-async function submitResetPassword() {
-    const pw  = document.getElementById('resetPwNew').value;
-    const cpw = document.getElementById('resetPwConfirm').value;
-    if (pw.length < 8)  { showToast('Password minimal 8 karakter.', 'error'); return; }
-    if (pw !== cpw)     { showToast('Konfirmasi password tidak cocok.', 'error'); return; }
+        async function submitResetPassword() {
+            const pw = document.getElementById('resetPwNew').value;
+            const cpw = document.getElementById('resetPwConfirm').value;
+            if (pw.length < 8) { showToast('Password minimal 8 karakter.', 'error'); return; }
+            if (pw !== cpw) { showToast('Konfirmasi password tidak cocok.', 'error'); return; }
 
-    const btn = document.getElementById('btnResetPw');
-    btn.disabled = true; btn.textContent = 'Menyimpan...';
-    try {
-        const data = await api({ action: 'master.user.update', target_id: resetPwTargetId, password: pw });
-        showToast(data.message || 'Password berhasil direset.', 'success');
-        closeModal('resetPwModal');
-    } catch(e) {
-        showToast(e.message, 'error');
-    } finally {
-        btn.disabled = false; btn.textContent = 'Reset Password';
-    }
-}
+            const btn = document.getElementById('btnResetPw');
+            btn.disabled = true; btn.textContent = 'Menyimpan...';
+            try {
+                const data = await api({ action: 'master.user.update', target_id: resetPwTargetId, password: pw });
+                showToast(data.message || 'Password berhasil direset.', 'success');
+                closeModal('resetPwModal');
+            } catch (e) {
+                showToast(e.message, 'error');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Reset Password';
+            }
+        }
 
-loadAll();
-</script>
+        loadAll();
+    </script>
 </body>
+
 </html>
