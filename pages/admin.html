@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
     <script src="../assets/js/loader.js"></script>
+    <script src="../assets/js/utils.js"></script>
     <style>
         /* ── Tabs ───────────────────────────────────────────────── */
         .tabs { display:flex; gap:.25rem; border-bottom:2px solid var(--border-color); margin-bottom:1.5rem; }
@@ -87,6 +88,10 @@
         .toast--success { background:#2D9E3C; }
         .toast--error   { background:#DC2626; }
         @keyframes slideUp { from{transform:translateY(8px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+        /* ── Reset PW button ─────────────────────────────────── */
+        .btn-reset { padding:.3rem .7rem; background:#fff; border:1px solid #D97706; border-radius:var(--radius-sm); font-size:.78rem; font-weight:600; cursor:pointer; color:#D97706; }
+        .btn-reset:hover { background:#FEF3C7; }
     </style>
 </head>
 <body>
@@ -329,6 +334,31 @@
     </div>
 </div>
 
+<!-- Modal Reset Password -->
+<div class="overlay hidden" id="resetPwModal">
+    <div class="modal">
+        <div class="modal-title">Reset Password Pengguna</div>
+        <div style="background:var(--surface-main);border-radius:var(--radius-sm);padding:.75rem 1rem;margin-bottom:1.25rem;">
+            <strong id="resetPwName" style="font-size:.9375rem;color:var(--text-main)">-</strong>
+            <div id="resetPwEmail" style="color:#6B7280;font-size:.8125rem;margin-top:.2rem"></div>
+        </div>
+        <div class="form-grid">
+            <div class="f-field">
+                <label>Password Baru</label>
+                <input type="password" id="resetPwNew" placeholder="Min. 8 karakter" autocomplete="new-password">
+            </div>
+            <div class="f-field">
+                <label>Konfirmasi Password</label>
+                <input type="password" id="resetPwConfirm" placeholder="Ulangi password baru">
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal('resetPwModal')">Batal</button>
+            <button class="btn-save" id="btnResetPw" onclick="submitResetPassword()">Reset Password</button>
+        </div>
+    </div>
+</div>
+
 <script src="../assets/js/auth.js"></script>
 <script>
 const user = requireAuth();
@@ -370,17 +400,6 @@ document.querySelectorAll('.overlay').forEach(o => {
     o.addEventListener('click', e => { if (e.target === o) o.classList.add('hidden'); });
 });
 
-function showToast(msg, type) {
-    const t = document.createElement('div');
-    t.className = 'toast toast--' + type;
-    t.textContent = msg;
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 4000);
-}
-
-function escHtml(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
 
 // ── Load All Data ─────────────────────────────────────────
 async function loadAll() {
@@ -429,6 +448,7 @@ function renderUsers() {
             <td>${statusBadge}</td>
             <td><div class="action-btns">
                 <button class="btn-edit" onclick='openUserModal(${escHtml(JSON.stringify(u))})'>Edit</button>
+                <button class="btn-reset" onclick="openResetPasswordModal('${escHtml(String(u.id))}','${escHtml(u.name)}','${escHtml(u.email)}')">Reset PW</button>
                 <button class="btn-delete" onclick="deleteUser('${escHtml(String(u.id))}','${escHtml(u.name)}')">Nonaktifkan</button>
             </div></td>
         </tr>`;
@@ -686,6 +706,38 @@ function populateSelects() {
         sel.innerHTML = opts;
         sel.value = cur;
     });
+}
+
+// ── Reset Password ────────────────────────────────────────
+let resetPwTargetId = null;
+
+function openResetPasswordModal(userId, userName, email) {
+    resetPwTargetId = userId;
+    document.getElementById('resetPwName').textContent  = userName;
+    document.getElementById('resetPwEmail').textContent = email;
+    document.getElementById('resetPwNew').value     = '';
+    document.getElementById('resetPwConfirm').value = '';
+    document.getElementById('resetPwModal').classList.remove('hidden');
+    setTimeout(() => document.getElementById('resetPwNew').focus(), 50);
+}
+
+async function submitResetPassword() {
+    const pw  = document.getElementById('resetPwNew').value;
+    const cpw = document.getElementById('resetPwConfirm').value;
+    if (pw.length < 8)  { showToast('Password minimal 8 karakter.', 'error'); return; }
+    if (pw !== cpw)     { showToast('Konfirmasi password tidak cocok.', 'error'); return; }
+
+    const btn = document.getElementById('btnResetPw');
+    btn.disabled = true; btn.textContent = 'Menyimpan...';
+    try {
+        const data = await api({ action: 'master.user.update', target_id: resetPwTargetId, password: pw });
+        showToast(data.message || 'Password berhasil direset.', 'success');
+        closeModal('resetPwModal');
+    } catch(e) {
+        showToast(e.message, 'error');
+    } finally {
+        btn.disabled = false; btn.textContent = 'Reset Password';
+    }
 }
 
 loadAll();

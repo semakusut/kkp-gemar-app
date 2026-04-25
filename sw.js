@@ -1,9 +1,9 @@
 /**
- * GEMAR-KKP Service Worker
+ * GEMAR-KKP Service Worker v2.6.0
  * Network First with Auto-Update Notification
  */
 
-const CACHE_NAME = 'gemar-kkp-v2.5.0';
+const CACHE_NAME = 'gemar-kkp-v2.6.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -19,11 +19,11 @@ const ASSETS_TO_CACHE = [
   './assets/css/gemar-style.css',
   './assets/css/dashboard.css',
   './assets/css/login-mobile.css',
+  './assets/js/utils.js',
   './assets/js/auth.js',
   './assets/js/loader.js',
   './assets/img/logo.svg',
-  './manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+  './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -36,12 +36,18 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((names) => {
-      return Promise.all(names.map((name) => {
-        if (name !== CACHE_NAME) return caches.delete(name);
-      }));
+      const oldCaches = names.filter((name) => name !== CACHE_NAME);
+      return Promise.all(oldCaches.map((name) => caches.delete(name)))
+        .then(() => self.clients.claim())
+        .then(() => {
+          if (oldCaches.length > 0) {
+            return self.clients.matchAll({ type: 'window' }).then((clients) =>
+              clients.forEach((c) => c.postMessage({ type: 'NEW_VERSION_AVAILABLE' }))
+            );
+          }
+        });
     })
   );
-  return self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {

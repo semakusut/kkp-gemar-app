@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
     <script src="../assets/js/loader.js"></script>
+    <script src="../assets/js/utils.js"></script>
     <style>
         /* ── Generate Card ──────────────────────────────────────── */
         .generate-card { background:#fff; border:1px solid var(--border-color); border-radius:var(--radius-lg); padding:1.75rem 2rem; margin-bottom:1.5rem; }
@@ -291,9 +292,6 @@
     const user = requireAuth();
     if (!user) throw new Error('redirect');
     if (user.role === 'upt_admin') window.location.href = 'dashboard.html';
-
-    const NAMA_BULAN = ['','Januari','Februari','Maret','April','Mei','Juni',
-                        'Juli','Agustus','September','Oktober','November','Desember'];
 
     const roleLabels = { eselon1:'Sekretaris Ditjen / Badan', superadmin:'Sekretaris Jenderal' };
     document.getElementById('userInfo').textContent = (user.name || '') + ' — ' + (roleLabels[user.role] || user.role);
@@ -621,16 +619,7 @@
         window.print();
     }
 
-    // ── Helpers ───────────────────────────────────────────────
-    function fmtNum(val) { return (parseFloat(val)||0).toLocaleString('id-ID'); }
-    function fmtRp(val)  { return 'Rp ' + (parseFloat(val)||0).toLocaleString('id-ID'); }
-    function escHtml(s)  { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-    function showToast(msg, type) {
-        const t = document.createElement('div');
-        t.className = 'toast toast--' + type;
-        t.textContent = msg;
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), 4500);
+    // Helpers (escHtml, fmtNum, fmtRp, showToast, NAMA_BULAN) from utils.js
     }
 
     loadFinalReports();
