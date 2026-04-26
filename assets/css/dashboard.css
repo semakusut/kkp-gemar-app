@@ -661,31 +661,9 @@ html {
         overflow: hidden;
     }
 
+    /* Header disembunyikan di mobile — bottom nav menggantikan navigasi */
     .header {
-        flex-shrink: 0;
-        padding: 0 20px;
-        padding-top: env(safe-area-inset-top, 0px);
-        padding-left: max(20px, env(safe-area-inset-left, 0px));
-        padding-right: max(20px, env(safe-area-inset-right, 0px));
-        height: calc(52px + env(safe-area-inset-top, 0px));
-        justify-content: center;
-        position: static;
-    }
-
-    /* Logo dihilangkan di mobile — nav pindah ke bawah */
-    .header__logo {
         display: none !important;
-    }
-
-    /* Nav pindah ke bottom nav — sembunyikan di header */
-    .header__nav {
-        display: none !important;
-    }
-
-    .header__title {
-        font-size: 15px;
-        letter-spacing: 0.2px;
-        display: block;
     }
 
     .main {
