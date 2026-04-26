@@ -1,9 +1,9 @@
 /**
- * GEMAR-KKP Service Worker v2.6.0
+ * GEMAR-KKP Service Worker v2.9.0
  * Network First with Auto-Update Notification
  */
 
-const CACHE_NAME = 'gemar-kkp-v2.7.0';
+const CACHE_NAME = 'gemar-kkp-v2.9.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

@@ -2,3 +2,4 @@
 *.gs
 database/
 gas-backend/
+opencode.json

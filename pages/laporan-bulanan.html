@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
     <script src="../assets/js/loader.js"></script>
+    <script src="../assets/js/utils.js"></script>
     <style>
         .form-container {
             max-width: 800px;
@@ -291,6 +292,7 @@
     <script>
         const user = requireAuth();
         if (!user) throw new Error('redirect to login');
+        initBottomNav('buat');
 
         const params = new URLSearchParams(window.location.search);
         const editId = params.get('edit');

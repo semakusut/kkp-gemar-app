@@ -186,6 +186,11 @@
             color: #1D4ED8;
         }
 
+        .role-badge--eselon2 {
+            background: #F0F9FF;
+            color: #0369A1;
+        }
+
         .role-badge--eselon1 {
             background: #F0FDF4;
             color: #166534;
@@ -194,6 +199,11 @@
         .role-badge--superadmin {
             background: #FEF3C7;
             color: #92400E;
+        }
+
+        .role-badge--asisten_superadmin {
+            background: #FFF7ED;
+            color: #C2410C;
         }
 
         /* ── Action buttons ─────────────────────────────────────── */
@@ -462,6 +472,208 @@
         .btn-reset:hover {
             background: #FEF3C7;
         }
+
+        /* ── Custom Confirm Modal ─────────────────────────────────── */
+        .confirm-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 20, 40, 0.55);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem env(safe-area-inset-right, 0) 1.25rem env(safe-area-inset-left, 0);
+            opacity: 1;
+            transition: opacity .18s ease;
+        }
+        .confirm-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        @keyframes confirmPop {
+            from { opacity: 0; transform: scale(.93) translateY(10px); }
+            to   { opacity: 1; transform: scale(1)   translateY(0);    }
+        }
+        .confirm-dialog {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem 1.75rem 1.5rem;
+            width: min(360px, calc(100vw - 2.5rem));
+            box-shadow: 0 20px 60px rgba(10, 20, 60, .22), 0 4px 16px rgba(10, 20, 60, .12);
+            text-align: center;
+            animation: confirmPop .22s cubic-bezier(.34,1.3,.64,1) both;
+        }
+        .confirm-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .confirm-icon--danger  { background: #FEE2E2; color: #DC2626; }
+        .confirm-icon--warning { background: #FEF3C7; color: #D97706; }
+        .confirm-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0F2040;
+            margin-bottom: .4rem;
+            line-height: 1.3;
+        }
+        .confirm-msg {
+            font-size: .875rem;
+            color: #64748B;
+            line-height: 1.55;
+            margin-bottom: 1.5rem;
+        }
+        .confirm-actions {
+            display: flex;
+            gap: .65rem;
+            justify-content: center;
+        }
+        .confirm-btn {
+            flex: 1;
+            padding: .62rem 1rem;
+            border-radius: 8px;
+            border: none;
+            font-family: inherit;
+            font-size: .875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: filter .15s, transform .1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .confirm-btn:active { transform: scale(.97); }
+        .confirm-cancel {
+            background: #F1F5F9;
+            color: #475569;
+        }
+        .confirm-cancel:hover { filter: brightness(.96); }
+        .confirm-ok--danger {
+            background: #DC2626;
+            color: #fff;
+        }
+        .confirm-ok--danger:hover  { filter: brightness(1.1); }
+        .confirm-ok--warning {
+            background: #D97706;
+            color: #fff;
+        }
+        .confirm-ok--warning:hover { filter: brightness(1.1); }
+        @media (max-width: 600px) {
+            .confirm-dialog {
+                padding: 1.75rem 1.25rem 1.25rem;
+                padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 0));
+            }
+        }
+
+        /* ── Mobile Responsive (≤767px) ──────────────────────────── */
+        @media (max-width: 767px) {
+            /* Toolbar: stack vertically */
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar input[type=search] { width: 100%; box-sizing: border-box; }
+            .btn-add { width: 100%; justify-content: center; padding: 0.625rem 1rem; }
+
+            /* Tabs: horizontal scroll if needed */
+            .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
+            .tab-btn { white-space: nowrap; flex-shrink: 0; }
+
+            /* Modal: single-column */
+            .form-grid.two-col { grid-template-columns: 1fr; }
+            .modal-actions { flex-direction: column-reverse; }
+            .modal-actions .btn-save,
+            .modal-actions .btn-cancel { width: 100%; text-align: center; }
+
+            /* ─── Table → Card stack (shared base) ─────────────── */
+            .table-card { background: transparent; border: none; border-radius: 0; overflow: visible; }
+            .table-wrap { overflow: visible; }
+            table  { display: block; }
+            thead  { display: none; }
+            tbody  { display: flex; flex-direction: column; gap: 0.5rem; }
+
+            tbody tr {
+                display: flex;
+                flex-direction: column;
+                background: #fff;
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 0.875rem 1rem;
+                position: relative;
+            }
+            tbody tr:hover { background: #fff; }
+            tbody td { display: block; padding: 0; border: none; }
+
+            /* Empty / loading state row */
+            tbody td[colspan] {
+                display: block !important;
+                position: static !important;
+                padding: 0 !important;
+                order: 0 !important;
+            }
+
+            /* ─── Users table ───────────────────────────────────── */
+            /* td1: Email — subtitle */
+            #users-table tbody td:nth-child(1) { order: 2; font-size: 0.8125rem; color: #6B7280; margin-top: 0.125rem; padding-right: 80px; }
+            /* td2: Nama — title */
+            #users-table tbody td:nth-child(2) { order: 1; font-size: 0.9375rem; font-weight: 600; }
+            /* td3: Role */
+            #users-table tbody td:nth-child(3) { order: 3; margin-top: 0.375rem; }
+            /* td4: UPT / Eselon I */
+            #users-table tbody td:nth-child(4) { order: 4; font-size: 0.8125rem; color: #6B7280; margin-top: 0.25rem; }
+            /* td5: Status — pinned top-right */
+            #users-table tbody td:nth-child(5) { position: absolute; top: 0.875rem; right: 1rem; }
+            /* td6: Aksi */
+            #users-table tbody td:nth-child(6) { order: 5; margin-top: 0.75rem; }
+            #users-table tbody td:nth-child(6) .action-btns { flex-wrap: wrap; gap: 0.375rem; }
+            #users-table tbody td:nth-child(6) .action-btns > * {
+                flex: 1; min-height: 36px; font-size: 0.8125rem;
+                display: inline-flex; align-items: center; justify-content: center;
+            }
+
+            /* ─── UPT table ─────────────────────────────────────── */
+            /* td1: Kode — small label */
+            #upt-table tbody td:nth-child(1) { order: 1; font-size: 0.75rem; font-weight: 700; color: var(--primary-main); letter-spacing: 0.05em; }
+            /* td2: Nama UPT — title */
+            #upt-table tbody td:nth-child(2) { order: 2; font-size: 0.9375rem; font-weight: 600; margin-top: 0.125rem; padding-right: 80px; }
+            /* td3: Jenis */
+            #upt-table tbody td:nth-child(3) { order: 3; font-size: 0.8125rem; color: #6B7280; margin-top: 0.125rem; }
+            /* td4: Eselon I */
+            #upt-table tbody td:nth-child(4) { order: 4; font-size: 0.8125rem; margin-top: 0.25rem; }
+            /* td5: Penanggung Jawab */
+            #upt-table tbody td:nth-child(5) { order: 5; font-size: 0.8125rem; color: #6B7280; margin-top: 0.125rem; }
+            /* td6: Status — pinned top-right */
+            #upt-table tbody td:nth-child(6) { position: absolute; top: 0.875rem; right: 1rem; }
+            /* td7: Aksi */
+            #upt-table tbody td:nth-child(7) { order: 6; margin-top: 0.75rem; }
+            #upt-table tbody td:nth-child(7) .action-btns { gap: 0.375rem; }
+            #upt-table tbody td:nth-child(7) .action-btns > * {
+                flex: 1; min-height: 36px; font-size: 0.8125rem;
+                display: inline-flex; align-items: center; justify-content: center;
+            }
+
+            /* ─── Eselon I table ────────────────────────────────── */
+            /* td1: Kode */
+            #eselon1-table tbody td:nth-child(1) { order: 1; font-size: 0.75rem; font-weight: 700; color: var(--primary-main); letter-spacing: 0.05em; }
+            /* td2: Nama — title */
+            #eselon1-table tbody td:nth-child(2) { order: 2; font-size: 0.9375rem; font-weight: 600; margin-top: 0.125rem; padding-right: 80px; }
+            /* td3: Singkatan */
+            #eselon1-table tbody td:nth-child(3) { order: 3; font-size: 0.8125rem; color: #6B7280; margin-top: 0.125rem; }
+            /* td4: Sekretaris */
+            #eselon1-table tbody td:nth-child(4) { order: 4; font-size: 0.8125rem; margin-top: 0.25rem; }
+            /* td5: Email */
+            #eselon1-table tbody td:nth-child(5) { order: 5; font-size: 0.8125rem; color: #6B7280; margin-top: 0.125rem; }
+            /* td6: Target Hemat */
+            #eselon1-table tbody td:nth-child(6) { order: 6; font-size: 0.875rem; font-weight: 600; margin-top: 0.25rem; }
+            /* td7: Status — pinned top-right */
+            #eselon1-table tbody td:nth-child(7) { position: absolute; top: 0.875rem; right: 1rem; }
+            /* td8: Aksi */
+            #eselon1-table tbody td:nth-child(8) { order: 7; margin-top: 0.75rem; }
+            #eselon1-table tbody td:nth-child(8) .action-btns { gap: 0.375rem; }
+        }
     </style>
 </head>
 
@@ -574,13 +786,14 @@
                                     <th>Singkatan</th>
                                     <th>Sekretaris</th>
                                     <th>Email</th>
+                                    <th>Target Hemat</th>
                                     <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="eselon1-body">
                                 <tr>
-                                    <td colspan="7">
+                                    <td colspan="8">
                                         <div class="state-box">Memuat...</div>
                                     </td>
                                 </tr>
@@ -610,8 +823,10 @@
                     <label>Role</label>
                     <select id="uRole" onchange="toggleRoleFields()">
                         <option value="upt_admin">Admin UPT</option>
-                        <option value="eselon1">Sekretaris Ditjen/Badan</option>
-                        <option value="superadmin">Sekretaris Jenderal</option>
+                        <option value="eselon2">Sekretariat Ditjen/Badan</option>
+                        <option value="eselon1">Pejabat Eselon I</option>
+                        <option value="asisten_superadmin">Asisten Superadmin</option>
+                        <option value="superadmin">Superadmin</option>
                     </select>
                 </div>
                 <div class="f-field" id="fieldUpt">
@@ -680,6 +895,10 @@
                     <label>Penanggung Jawab</label>
                     <input type="text" id="uptPJ" placeholder="Nama">
                 </div>
+                <div class="f-field">
+                    <label>NIP Penanggung Jawab</label>
+                    <input type="text" id="uptNip" placeholder="19XXXXXXXXXXXXXX" maxlength="18">
+                </div>
                 <div class="f-field span-2">
                     <label>Alamat</label>
                     <input type="text" id="uptAlamat" placeholder="Alamat kantor">
@@ -730,12 +949,20 @@
                     <input type="text" id="e1Sekretaris" placeholder="Nama sekretaris">
                 </div>
                 <div class="f-field">
+                    <label>NIP Sekretaris</label>
+                    <input type="text" id="e1Nip" placeholder="19XXXXXXXXXXXXXX" maxlength="18">
+                </div>
+                <div class="f-field">
                     <label>Telepon</label>
                     <input type="text" id="e1Telepon" placeholder="021-xxxx">
                 </div>
                 <div class="f-field">
                     <label>Email</label>
                     <input type="email" id="e1Email" placeholder="sekretariat@kkp.go.id">
+                </div>
+                <div class="f-field">
+                    <label>Target Penghematan (%)</label>
+                    <input type="number" id="e1Target" min="0" max="100" step="0.5" placeholder="10">
                 </div>
                 <div class="f-field">
                     <label>Status</label>
@@ -782,7 +1009,8 @@
     <script>
         const user = requireAuth();
         if (!user) throw new Error('redirect');
-        if (user.role !== 'superadmin') window.location.href = 'dashboard.html';
+        if (user.role !== 'superadmin' && user.role !== 'asisten_superadmin') window.location.href = 'dashboard.html';
+        initBottomNav('admin');
 
         // Cache data
         let allUsers = [], allUpt = [], allEselon1 = [];
@@ -845,7 +1073,7 @@
         }
 
         function renderUsers() {
-            const roleLabel = { upt_admin: 'Admin UPT', eselon1: 'Sekretaris Ditjen/Badan', superadmin: 'Sekretaris Jenderal' };
+            const roleLabel = { upt_admin: 'Admin UPT', eselon2: 'Sekretariat Ditjen/Badan', eselon1: 'Pejabat Eselon I', asisten_superadmin: 'Asisten Superadmin', superadmin: 'Superadmin' };
             const tbody = document.getElementById('users-body');
             if (!allUsers.length) {
                 tbody.innerHTML = '<tr><td colspan="6"><div class="state-box">Belum ada pengguna.</div></td></tr>';
@@ -857,7 +1085,7 @@
                     : (u.active == false || u.active === 'FALSE'
                         ? '<span class="badge badge--inactive">Nonaktif</span>'
                         : '<span class="badge badge--active">Aktif</span>');
-                const assoc = u.role === 'upt_admin' ? (u.upt_id || '—')
+                const assoc = (u.role === 'upt_admin' || u.role === 'eselon2') ? (u.upt_id || '—')
                     : u.role === 'eselon1' ? (u.eselon1_id || '—') : '—';
                 return `<tr>
             <td>${escHtml(u.email)}</td>
@@ -868,7 +1096,8 @@
             <td><div class="action-btns">
                 <button class="btn-edit" onclick='openUserModal(${escHtml(JSON.stringify(u))})'>Edit</button>
                 <button class="btn-reset" onclick="openResetPasswordModal('${escHtml(String(u.id))}','${escHtml(u.name)}','${escHtml(u.email)}')">Reset PW</button>
-                <button class="btn-delete" onclick="deleteUser('${escHtml(String(u.id))}','${escHtml(u.name)}')">Nonaktifkan</button>
+                ${user.role === 'asisten_superadmin' && u.role === 'superadmin' ? '' :
+                  `<button class="btn-delete" onclick="deleteUser('${escHtml(String(u.id))}','${escHtml(u.name)}','${escHtml(u.email)}')">Hapus</button>`}
             </div></td>
         </tr>`;
             }).join('');
@@ -876,8 +1105,8 @@
 
         function toggleRoleFields() {
             const role = document.getElementById('uRole').value;
-            document.getElementById('fieldUpt').style.display = role === 'upt_admin' ? '' : 'none';
-            document.getElementById('fieldEselon').style.display = (role === 'upt_admin' || role === 'eselon1') ? '' : 'none';
+            document.getElementById('fieldUpt').style.display    = (role === 'upt_admin' || role === 'eselon2') ? '' : 'none';
+            document.getElementById('fieldEselon').style.display = (role === 'upt_admin' || role === 'eselon2' || role === 'eselon1') ? '' : 'none';
         }
 
         function openUserModal(u) {
@@ -896,6 +1125,13 @@
             document.getElementById('pwHint').textContent = isEdit ? '(kosongkan untuk tidak mengubah)' : '(wajib untuk akun baru)';
             document.getElementById('fieldLocked').style.display = isEdit ? '' : 'none';
             toggleRoleFields();
+            // asisten_superadmin cannot set the superadmin role
+            const superadminOpt = document.querySelector('#uRole option[value="superadmin"]');
+            if (superadminOpt) superadminOpt.hidden = (user.role === 'asisten_superadmin');
+            if (user.role === 'asisten_superadmin' && document.getElementById('uRole').value === 'superadmin') {
+                document.getElementById('uRole').value = 'upt_admin';
+                toggleRoleFields();
+            }
             document.getElementById('userModal').classList.remove('hidden');
         }
 
@@ -929,8 +1165,14 @@
             }
         }
 
-        async function deleteUser(id, name) {
-            if (!confirm('Nonaktifkan pengguna "' + name + '"?')) return;
+        async function deleteUser(id, name, email) {
+            const ok = await showConfirm({
+                title: 'Hapus Akun Pengguna?',
+                message: 'Akun "' + name + '" (' + email + ') akan dihapus secara permanen beserta semua laporan bulanannya. Tindakan ini tidak dapat dibatalkan.',
+                confirmText: 'Hapus Permanen',
+                type: 'danger'
+            });
+            if (!ok) return;
             try {
                 const data = await api({ action: 'master.user.delete', target_id: id });
                 showToast(data.message, 'success');
@@ -981,6 +1223,7 @@
             document.getElementById('uptEselon1Id').value = isEdit ? (u.eselon1_id || '') : '';
             document.getElementById('uptAlamat').value = isEdit ? (u.alamat || '') : '';
             document.getElementById('uptPJ').value = isEdit ? (u.penanggung_jawab || '') : '';
+            document.getElementById('uptNip').value = isEdit ? (u.nip || '') : '';
             document.getElementById('uptTelepon').value = isEdit ? (u.telepon || '') : '';
             document.getElementById('uptActive').value = isEdit ? String(u.active) : 'true';
             document.getElementById('uptModal').classList.remove('hidden');
@@ -998,6 +1241,7 @@
                 eselon1_id: document.getElementById('uptEselon1Id').value,
                 alamat: document.getElementById('uptAlamat').value,
                 penanggung_jawab: document.getElementById('uptPJ').value,
+                nip: document.getElementById('uptNip').value,
                 telepon: document.getElementById('uptTelepon').value,
                 active: document.getElementById('uptActive').value
             };
@@ -1013,7 +1257,13 @@
         }
 
         async function deleteUpt(id, kode) {
-            if (!confirm('Nonaktifkan UPT "' + kode + '"?')) return;
+            const ok = await showConfirm({
+                title: 'Nonaktifkan UPT?',
+                message: 'UPT "' + kode + '" akan dinonaktifkan. Data tidak dihapus dan dapat diaktifkan kembali.',
+                confirmText: 'Nonaktifkan',
+                type: 'warning'
+            });
+            if (!ok) return;
             try {
                 const data = await api({ action: 'master.upt.delete', target_id: id });
                 showToast(data.message, 'success');
@@ -1029,28 +1279,32 @@
                 renderEselon1();
             } catch (e) {
                 document.getElementById('eselon1-body').innerHTML =
-                    '<tr><td colspan="7"><div class="state-box">Gagal: ' + e.message + '</div></td></tr>';
+                    '<tr><td colspan="8"><div class="state-box">Gagal: ' + e.message + '</div></td></tr>';
             }
         }
 
         function renderEselon1() {
             const tbody = document.getElementById('eselon1-body');
             if (!allEselon1.length) {
-                tbody.innerHTML = '<tr><td colspan="7"><div class="state-box">Belum ada Eselon I.</div></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8"><div class="state-box">Belum ada Eselon I.</div></td></tr>';
                 return;
             }
-            tbody.innerHTML = allEselon1.map(e => `<tr>
+            tbody.innerHTML = allEselon1.map(e => {
+                const target = parseFloat(e.target_persen_hemat) || 10;
+                return `<tr>
         <td><strong>${escHtml(e.kode)}</strong></td>
         <td>${escHtml(e.nama)}</td>
         <td class="text-muted">${escHtml(e.singkat || '—')}</td>
         <td class="text-muted">${escHtml(e.sekretaris || '—')}</td>
         <td class="text-muted">${escHtml(e.email || '—')}</td>
+        <td><span class="badge" style="background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE">${target}%</span></td>
         <td>${e.active == false || e.active === 'FALSE' ? '<span class="badge badge--inactive">Nonaktif</span>' : '<span class="badge badge--active">Aktif</span>'}</td>
         <td><div class="action-btns">
             <button class="btn-edit" onclick='openEselon1Modal(${escHtml(JSON.stringify(e))})'>Edit</button>
             <button class="btn-delete" onclick="deleteEselon1('${escHtml(String(e.id))}','${escHtml(e.kode)}')">Nonaktifkan</button>
         </div></td>
-    </tr>`).join('');
+    </tr>`;
+            }).join('');
         }
 
         function openEselon1Modal(e) {
@@ -1063,8 +1317,10 @@
             document.getElementById('e1Singkat').value = isEdit ? (e.singkat || '') : '';
             document.getElementById('e1Jenis').value = isEdit ? (e.jenis || '') : '';
             document.getElementById('e1Sekretaris').value = isEdit ? (e.sekretaris || '') : '';
+            document.getElementById('e1Nip').value = isEdit ? (e.nip || '') : '';
             document.getElementById('e1Telepon').value = isEdit ? (e.telepon || '') : '';
             document.getElementById('e1Email').value = isEdit ? (e.email || '') : '';
+            document.getElementById('e1Target').value = isEdit ? (parseFloat(e.target_persen_hemat) || 10) : 10;
             document.getElementById('e1Active').value = isEdit ? String(e.active) : 'true';
             document.getElementById('eselon1Modal').classList.remove('hidden');
         }
@@ -1080,8 +1336,10 @@
                 singkat: document.getElementById('e1Singkat').value,
                 jenis: document.getElementById('e1Jenis').value,
                 sekretaris: document.getElementById('e1Sekretaris').value,
+                nip: document.getElementById('e1Nip').value,
                 telepon: document.getElementById('e1Telepon').value,
                 email: document.getElementById('e1Email').value,
+                target_persen_hemat: document.getElementById('e1Target').value,
                 active: document.getElementById('e1Active').value
             };
             if (id) params.target_id = id;
@@ -1096,7 +1354,13 @@
         }
 
         async function deleteEselon1(id, kode) {
-            if (!confirm('Nonaktifkan Eselon I "' + kode + '"?')) return;
+            const ok = await showConfirm({
+                title: 'Nonaktifkan Eselon I?',
+                message: 'Unit Eselon I "' + kode + '" akan dinonaktifkan. Data tidak dihapus dan dapat diaktifkan kembali.',
+                confirmText: 'Nonaktifkan',
+                type: 'warning'
+            });
+            if (!ok) return;
             try {
                 const data = await api({ action: 'master.eselon1.delete', target_id: id });
                 showToast(data.message, 'success');
@@ -1160,7 +1424,56 @@
         }
 
         loadAll();
+
+        // ── Custom Confirm Modal ──────────────────────────────────
+        let _confirmResolve = null;
+
+        function showConfirm({ title, message, confirmText = 'Ya, Lanjutkan', cancelText = 'Batal', type = 'danger' }) {
+            return new Promise(resolve => {
+                _confirmResolve = resolve;
+                const overlay = document.getElementById('confirmModal');
+                overlay.querySelector('.confirm-icon').className = 'confirm-icon confirm-icon--' + type;
+                overlay.querySelector('.confirm-icon').textContent = type === 'danger' ? '🗑' : '⚠️';
+                overlay.querySelector('.confirm-title').textContent = title;
+                overlay.querySelector('.confirm-msg').textContent = message;
+                const okBtn = overlay.querySelector('.confirm-ok');
+                okBtn.textContent = confirmText;
+                okBtn.className = 'confirm-btn confirm-ok confirm-ok--' + type;
+                overlay.querySelector('.confirm-cancel').textContent = cancelText;
+                overlay.classList.remove('hidden');
+                overlay.querySelector('.confirm-ok').focus();
+            });
+        }
+
+        function _resolveConfirm(val) {
+            const overlay = document.getElementById('confirmModal');
+            overlay.classList.add('hidden');
+            if (_confirmResolve) { _confirmResolve(val); _confirmResolve = null; }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('confirmModal').addEventListener('click', function(e) {
+                if (e.target === this) _resolveConfirm(false);
+            });
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && _confirmResolve) _resolveConfirm(false);
+        });
     </script>
+
+    <!-- Confirm Modal -->
+    <div class="confirm-overlay hidden" id="confirmModal" role="dialog" aria-modal="true">
+        <div class="confirm-dialog">
+            <div class="confirm-icon confirm-icon--danger">🗑</div>
+            <div class="confirm-title">Konfirmasi</div>
+            <div class="confirm-msg"></div>
+            <div class="confirm-actions">
+                <button class="confirm-btn confirm-cancel" onclick="_resolveConfirm(false)">Batal</button>
+                <button class="confirm-btn confirm-ok confirm-ok--danger" onclick="_resolveConfirm(true)">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

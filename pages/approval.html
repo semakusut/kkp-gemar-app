@@ -793,6 +793,7 @@
         if (user.role === 'upt_admin') {
             window.location.href = 'dashboard.html';
         }
+        initBottomNav('approval');
 
 
         const roleLabels = { eselon1: 'Sekretaris Ditjen / Badan', superadmin: 'Sekretaris Jenderal' };
@@ -802,7 +803,7 @@
         document.getElementById('filterTahun').value = new Date().getFullYear();
 
         // Simpan eselon1_id untuk filter laporan
-        const ESELON1_ID = user.role === 'eselon1' ? user.eselon1_id : null;
+        const ESELON1_ID = user.role === 'eselon1' ? user.eselon1Id : null;
 
         let allReports = [];
         let filteredReports = [];

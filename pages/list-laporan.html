@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
     <script src="../assets/js/loader.js"></script>
+    <script src="../assets/js/utils.js"></script>
 
     <style>
         .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
@@ -246,6 +247,7 @@
     <script>
         const user = requireAuth();
         if (!user) throw new Error('redirect to login');
+        initBottomNav('list');
 
         // Simpan user ke variabel global untuk diakses di fungsi lain
         currentUser = user;

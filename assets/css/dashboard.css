@@ -32,14 +32,19 @@ body {
     min-height: 100vh;
     /* iOS: bottom padding for home indicator */
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    /* Prevent rubber-band scroll from exposing white bg on iOS */
-    overflow-x: hidden;
 }
 
 /* Prevent text size adjustment on iOS rotation */
 html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    /* overflow-x di html/body tidak digunakan karena merusak position:fixed di iOS Safari.
+       Horizontal overflow dicegah di wrapper .dashboard saja. */
+}
+
+/* Wrapper utama semua page — cukup di sini, tidak di body/html */
+.dashboard {
+    overflow-x: hidden;
 }
 
 /* ============================================================
@@ -633,31 +638,61 @@ html {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 768px) {
+    /* Layout full-height agar bottom nav selalu terlihat tanpa scroll */
+    html {
+        height: 100vh;
+        height: 100dvh;
+    }
+
+    body {
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+        padding-bottom: 0;
+    }
+
+    .dashboard {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        /* overflow:hidden mencegah .dashboard menjadi scroll container
+           (overflow-x:hidden di base CSS memicu overflow-y:auto implisit per CSS spec).
+           Hanya .main yang boleh scroll. */
+        overflow: hidden;
+    }
+
     .header {
-        padding: 0 16px;
+        flex-shrink: 0;
+        padding: 0 20px;
         padding-top: env(safe-area-inset-top, 0px);
-        padding-left: max(16px, env(safe-area-inset-left, 0px));
-        padding-right: max(16px, env(safe-area-inset-right, 0px));
-        height: calc(56px + env(safe-area-inset-top, 0px));
+        padding-left: max(20px, env(safe-area-inset-left, 0px));
+        padding-right: max(20px, env(safe-area-inset-right, 0px));
+        height: calc(52px + env(safe-area-inset-top, 0px));
+        justify-content: center;
+        position: static;
     }
 
+    /* Logo dihilangkan di mobile — nav pindah ke bawah */
+    .header__logo {
+        display: none !important;
+    }
+
+    /* Nav pindah ke bottom nav — sembunyikan di header */
     .header__nav {
-        gap: 2px;
+        display: none !important;
     }
 
-    .header__link {
-        padding: 8px 10px;
-        /* min 44px touch target via height */
-        font-size: 12.5px;
-        min-height: 36px;
-    }
-
-    .header__btn--logout {
-        padding: 8px 12px;
-        min-height: 36px;
+    .header__title {
+        font-size: 15px;
+        letter-spacing: 0.2px;
+        display: block;
     }
 
     .main {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         padding: 20px 16px;
     }
 
@@ -694,17 +729,95 @@ html {
 }
 
 @media (max-width: 480px) {
-    .header__title {
-        display: none;
-    }
-
     .actions__grid {
         grid-template-columns: repeat(2, 1fr);
     }
+}
 
-    .header__link {
-        font-size: 12px;
-        padding: 8px 8px;
+/* ============================================================
+   BOTTOM NAV — mobile PWA (Android & iOS thumb-friendly)
+   Tidak pakai position:fixed — lebih reliable di semua browser.
+   Nav menjadi flex child terakhir di .dashboard (flex column).
+   ============================================================ */
+.bottom-nav {
+    display: none;
+    background: #fff;
+    border-top: 1px solid rgba(27, 32, 104, 0.10);
+    box-shadow: 0 -2px 16px rgba(13, 15, 34, 0.08);
+    flex-shrink: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+}
+
+.bottom-nav__items {
+    display: flex;
+    height: 64px;
+    align-items: stretch;
+}
+
+.bottom-nav__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-decoration: none;
+    color: #9CA3AF;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--font);
+    transition: color 0.15s;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 6px 2px;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    line-height: 1;
+}
+
+.bottom-nav__item svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.bottom-nav__item--active {
+    color: var(--ocean);
+}
+
+.bottom-nav__item--active::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 3px;
+    background: var(--ocean);
+    border-radius: 0 0 4px 4px;
+}
+
+.bottom-nav__item:active {
+    color: var(--ocean);
+    background: rgba(53, 53, 238, 0.06);
+}
+
+.bottom-nav__item--logout {
+    color: #DC2626;
+    opacity: 0.75;
+}
+
+.bottom-nav__item--logout:active {
+    color: #DC2626;
+    background: rgba(220, 38, 38, 0.06);
+}
+
+@media (max-width: 768px) {
+    .bottom-nav {
+        display: block;
     }
 }
 

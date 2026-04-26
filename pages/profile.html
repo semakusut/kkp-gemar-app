@@ -134,11 +134,13 @@
 
     <script src="../assets/js/auth.js"></script>
     <script src="../assets/js/loader.js"></script>
+    <script src="../assets/js/utils.js"></script>
     <script>
         PageLoader.start('Memuat profil...');
         
         const user = requireAuth();
         if (!user) throw new Error('redirect to login');
+        initBottomNav('profile');
 
         const roleLabels = {
             'upt_admin': 'Admin UPT',

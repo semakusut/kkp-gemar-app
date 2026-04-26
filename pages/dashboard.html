@@ -19,6 +19,7 @@
     <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/loader.js"></script>
+    <script src="../assets/js/utils.js"></script>
 </head>
 
 <body>
@@ -91,8 +92,8 @@
                     </div>
                     <div class="stat-card__content">
                         <div class="stat-card__label">Total Penghematan</div>
-                        <div class="stat-card__value stat-card__value--gold" id="statHemat">Rp 2.5JT</div>
-                        <div class="stat-card__change stat-card__change--down">Target tercapai!</div>
+                        <div class="stat-card__value stat-card__value--gold" id="statHemat">-</div>
+                        <div class="stat-card__change" id="statHematChange">-</div>
                     </div>
 </div>
                 </section>
@@ -171,11 +172,14 @@
 
         const user = requireAuth();
         if (!user) throw new Error('redirect to login');
+        initBottomNav('dashboard');
 
         const roleLabels = {
-            'upt_admin': 'Admin UPT',
-            'eselon1': 'Sekretaris Ditjen / Badan',
-            'superadmin': 'Sekretaris Jenderal'
+            'upt_admin':           'Admin UPT',
+            'eselon2':             'Staff / Operator',
+            'eselon1':             'Sekretaris Ditjen / Badan',
+            'asisten_superadmin':  'Asisten Admin',
+            'superadmin':          'Sekretaris Jenderal'
         };
         document.getElementById('userName').textContent = user.name || 'User';
         document.getElementById('userRole').textContent = roleLabels[user.role] || user.role;
@@ -192,13 +196,21 @@
             document.getElementById('adminBtn').style.display = 'flex';
         }
 
-        const NAMA_BULAN = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
+        const BULAN_SHORT = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
         const sekarang = new Date();
         const tahunIni = sekarang.getFullYear();
         const bulanIni = sekarang.getMonth() + 1;
 
         let usageChart = null;
         const CACHE_KEY = 'monthly_list_all';
+
+        function formatRupiah(val) {
+            if (!val || val === 0) return 'Rp 0';
+            if (val >= 1e9) return 'Rp ' + (val / 1e9).toFixed(1).replace('.', ',') + ' M';
+            if (val >= 1e6) return 'Rp ' + (val / 1e6).toFixed(1).replace('.', ',') + ' JT';
+            if (val >= 1e3) return 'Rp ' + (val / 1e3).toFixed(0) + ' RB';
+            return 'Rp ' + Math.round(val).toLocaleString('id-ID');
+        }
 
         async function loadDashboardStats(isSilent = false) {
             // Render dari cache dulu — instant tanpa spinner
@@ -234,7 +246,7 @@
 
         function renderDashboard(reports) {
             processStats(reports);
-            if (user.role === 'eselon1' || user.role === 'superadmin') {
+            if (user.role === 'eselon1' || user.role === 'superadmin' || user.role === 'asisten_superadmin') {
                 document.getElementById('chartsSection').style.display = 'block';
                 renderChart(reports);
             }
@@ -272,6 +284,34 @@
             document.getElementById('statListrik').textContent = listrikNow.toLocaleString('id-ID') + ' kWh';
             document.getElementById('statAir').textContent = airNow.toLocaleString('id-ID') + ' m³';
             document.getElementById('statTelepon').textContent = teleponNow.toLocaleString('id-ID') + ' jam';
+
+            // === Penghematan card ===
+            const hematNow  = calcTotal(thisMonth, 'total_penghematan');
+            const hematLast = calcTotal(lastMonth, 'total_penghematan');
+            document.getElementById('statHemat').textContent = formatRupiah(hematNow);
+
+            const hematEl = document.getElementById('statHematChange');
+            if (hematEl) {
+                if (hematNow === 0 && hematLast === 0) {
+                    hematEl.textContent = 'Belum ada data penghematan';
+                    hematEl.className = 'stat-card__change';
+                } else if (hematLast === 0) {
+                    hematEl.textContent = 'Data bulan ini tersedia';
+                    hematEl.className = 'stat-card__change';
+                } else {
+                    const pct = ((hematNow - hematLast) / Math.abs(hematLast) * 100).toFixed(0);
+                    if (parseInt(pct) > 0) {
+                        hematEl.textContent = `↑ ${pct}% dari bulan lalu`;
+                        hematEl.className = 'stat-card__change stat-card__change--down';
+                    } else if (parseInt(pct) < 0) {
+                        hematEl.textContent = `↓ ${Math.abs(pct)}% dari bulan lalu`;
+                        hematEl.className = 'stat-card__change stat-card__change--up';
+                    } else {
+                        hematEl.textContent = '= Sama dengan bulan lalu';
+                        hematEl.className = 'stat-card__change';
+                    }
+                }
+            }
 
             const listChange = listrikLast > 0 ? ((listrikNow - listrikLast) / listrikLast * 100).toFixed(0) : 0;
             const airChange = airLast > 0 ? ((airNow - airLast) / airLast * 100).toFixed(0) : 0;
@@ -339,7 +379,7 @@
                 let b = bulanIni - i;
                 let y = tahunIni;
                 if (b <= 0) { b += 12; y -= 1; }
-                bulanLabels.push(NAMA_BULAN[b] + ' ' + y);
+                bulanLabels.push(BULAN_SHORT[b] + ' ' + y);
 
                 const monthReports = filteredReports.filter(r =>
                     String(r.bulan) === String(b) &&
@@ -444,10 +484,55 @@
             });
         }
 
+        // Untuk eselon1 & superadmin: update status penghematan dari final report
+        async function loadFinalStats() {
+            if (user.role !== 'eselon1' && user.role !== 'superadmin') return;
+            try {
+                const body = new URLSearchParams({ action: 'report.final.list', token: getToken() });
+                const res  = await fetch(AUTH_CONFIG.apiUrl, { method: 'POST', body });
+                const result = await res.json();
+                if (!result.success) return;
+
+                const reports = (result.data.reports || [])
+                    .filter(r => r.status === 'approved')
+                    .sort((a, b) => {
+                        if (String(b.tahun) !== String(a.tahun)) return String(b.tahun) - String(a.tahun);
+                        return String(b.bulan) - String(a.bulan);
+                    });
+
+                if (!reports.length) return;
+
+                // Cari laporan bulan ini atau bulan lalu
+                const candidates = reports.filter(r =>
+                    (String(r.tahun) === String(tahunIni) && String(r.bulan) === String(bulanIni)) ||
+                    (String(r.tahun) === String(bulanIni === 1 ? tahunIni - 1 : tahunIni) &&
+                     String(r.bulan) === String(bulanIni === 1 ? 12 : bulanIni - 1))
+                );
+                const latest = candidates.length ? candidates[0] : reports[0];
+
+                const pct    = parseFloat(latest.pct_penghematan) || 0;
+                const target = parseFloat(latest.target_persen_hemat) || 10;
+                const tercapai = latest.target_tercapai;
+                const bulanLabel = BULAN_SHORT[parseInt(latest.bulan)] + ' ' + latest.tahun;
+
+                const hematEl = document.getElementById('statHematChange');
+                if (!hematEl) return;
+
+                if (tercapai) {
+                    hematEl.textContent = `✓ Target tercapai ${pct.toFixed(1)}% ≥ ${target}% (${bulanLabel})`;
+                    hematEl.className = 'stat-card__change stat-card__change--down';
+                } else {
+                    hematEl.textContent = `${pct.toFixed(1)}% dari target ${target}% (${bulanLabel})`;
+                    hematEl.className = pct > 0 ? 'stat-card__change stat-card__change--up' : 'stat-card__change stat-card__change--up';
+                }
+            } catch (e) { /* silent */ }
+        }
+
         loadDashboardStats();
+        loadFinalStats();
 
         // Silent refresh setiap 5 menit — update data tanpa mengganggu UI
-        setInterval(() => loadDashboardStats(true), 5 * 60 * 1000);
+        setInterval(() => { loadDashboardStats(true); loadFinalStats(); }, 5 * 60 * 1000);
     </script>
 </body>
 </html>

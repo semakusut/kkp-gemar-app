@@ -95,11 +95,19 @@ async function handleLogin() {
   if (typeof PageLoader !== 'undefined') PageLoader.start('Memeriksa akun...');
 
   try {
+    var publicIp = '';
+    try {
+      var ipRes = await fetch('https://api.ipify.org?format=json');
+      var ipData = await ipRes.json();
+      publicIp = ipData.ip || '';
+    } catch (e) { /* network unavailable, ip stays empty */ }
+
     var body = new URLSearchParams({
       action: 'auth.login',
       email: email,
       password: password,
-      ip: ''
+      ip: publicIp,
+      user_agent: navigator.userAgent || ''
     });
 
     var response = await fetch(AUTH_CONFIG.apiUrl, {
