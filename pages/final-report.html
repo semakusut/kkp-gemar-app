@@ -46,8 +46,8 @@
         .preview-section.show { display:block; }
         .divider { border:none; border-top:1px solid var(--border-color); margin:1.5rem 0; }
 
-        .preview-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:.75rem; margin-bottom:1.25rem; }
-        .pv-item { background:var(--surface-main); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:.85rem 1rem; }
+        .preview-grid { display:flex; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+        .pv-item { background:var(--surface-main); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:.85rem 1rem; flex:none; width:max-content; min-width:140px; }
         .pv-item__label { font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:#6B7280; font-weight:600; }
         .pv-item__val   { font-size:1.1rem; font-weight:700; color:var(--text-main); margin-top:.2rem; }
         .pv-item__sub   { font-size:.72rem; color:#6B7280; }
@@ -314,7 +314,7 @@
         document.getElementById('generatePanel').style.display = 'block';
         document.getElementById('navApproval').style.display   = 'inline';
     }
-    if (user.role === 'superadmin') {
+    if (user.role === 'superadmin' || user.role === 'asisten_superadmin') {
         document.getElementById('colUnit').style.display = '';
     }
 
@@ -435,9 +435,10 @@
                 return;
             }
 
-            const isSuperadmin = user.role === 'superadmin';
+            const isSuperadmin = user.role === 'superadmin' || user.role === 'asisten_superadmin';
             tbody.innerHTML = reports.map(r => {
-                const periode   = NAMA_BULAN[parseInt(r.bulan)] + ' ' + r.tahun;
+                const bulanInt = parseInt(r.bulan);
+                const periode  = bulanInt === 0 ? 'Tahunan ' + r.tahun : NAMA_BULAN[bulanInt] + ' ' + r.tahun;
                 const isPending = r.status === 'pending_approval';
                 const badgeCls  = isPending ? 'badge--pending' : 'badge--approved';
                 const badgeTxt  = isPending ? 'Menunggu Persetujuan' : 'Disetujui';

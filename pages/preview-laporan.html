@@ -561,6 +561,97 @@
             .annual-table th, .annual-table td { padding: 2px 3px; }
             .annual-table td.num { font-size: 7.5pt; }
         }
+
+        /* ── Submit Final Report Button ──────────────────────── */
+        .btn-submit {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.30);
+        }
+        .btn-submit:hover {
+            box-shadow: 0 3px 12px rgba(5, 150, 105, 0.45);
+            transform: translateY(-1px);
+        }
+        .btn-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+        /* ── Submit Modal ────────────────────────────────────── */
+        .submit-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(0,0,0,.55);
+            backdrop-filter: blur(3px);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .submit-modal.active { display: flex; }
+        .submit-modal__box {
+            background: #fff;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
+        }
+        .submit-modal__head {
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .submit-modal__head h3 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #111827;
+        }
+        .submit-modal__head p {
+            margin: 2px 0 0;
+            font-size: 12px;
+            color: #6B7280;
+        }
+        .submit-modal__close {
+            all: unset;
+            cursor: pointer;
+            color: #9CA3AF;
+            font-size: 20px;
+            line-height: 1;
+            padding: 4px;
+        }
+        .submit-modal__close:hover { color: #374151; }
+        .submit-modal__body { padding: 20px 20px 16px; }
+        .submit-modal__foot {
+            padding: 14px 20px;
+            border-top: 1px solid #E5E7EB;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        .btn-sm-cancel {
+            all: unset; box-sizing: border-box;
+            padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 600;
+            cursor: pointer; color: #6B7280; border: 1px solid #D1D5DB;
+        }
+        .btn-sm-cancel:hover { background: #F3F4F6; }
+        .btn-sm-ok {
+            all: unset; box-sizing: border-box;
+            padding: 8px 20px; border-radius: 7px; font-size: 13px; font-weight: 600;
+            cursor: pointer; background: #059669; color: #fff;
+        }
+        .btn-sm-ok:hover { background: #047857; }
+        .btn-sm-ok:disabled { opacity: .5; cursor: not-allowed; }
+
+        /* ── Toast ───────────────────────────────────────────── */
+        .toast { position:fixed; bottom:1.5rem; right:1.5rem; padding:.75rem 1.1rem;
+            border-radius:10px; font-size:.875rem; font-weight:600; color:#fff;
+            z-index:9999; animation:slideUp .25s ease; max-width:340px; }
+        .toast--success { background:#059669; }
+        .toast--error   { background:#DC2626; }
+        @keyframes slideUp { from{transform:translateY(10px);opacity:0} to{transform:translateY(0);opacity:1} }
 </style>
 </head>
 <body>
@@ -599,6 +690,42 @@
                 </svg>
                 Unduh PDF
             </button>
+            <button class="btn btn-submit" id="btnSubmitFinal" style="display:none" onclick="openSubmitModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round">
+                    <path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/>
+                </svg>
+                Submit Final Report
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Submit Final Report -->
+    <div class="submit-modal" id="submitModal">
+        <div class="submit-modal__box">
+            <div class="submit-modal__head">
+                <div>
+                    <h3 id="submitModalTitle">Submit Final Report Tahunan</h3>
+                    <p>Data akan dikirim ke Sekretaris Jenderal untuk disetujui</p>
+                </div>
+                <button class="submit-modal__close" onclick="closeSubmitModal()">×</button>
+            </div>
+            <div class="submit-modal__body">
+                <p style="color:#374151;font-size:14px;margin:0;line-height:1.6">
+                    Final report tahunan <strong id="submitModalYear"></strong> akan disubmit ke
+                    Sekretaris Jenderal untuk disetujui.
+                </p>
+                <p style="color:#6B7280;font-size:12.5px;margin:10px 0 0;line-height:1.6">
+                    Data agregasi diambil otomatis dari seluruh laporan bulanan UPT yang sudah
+                    disetujui pada tahun tersebut. File laporan juga akan disimpan ke Google Drive.
+                </p>
+            </div>
+            <div class="submit-modal__foot">
+                <button class="btn-sm-cancel" onclick="closeSubmitModal()">Batal</button>
+                <button class="btn-sm-ok" id="btnDoSubmit" onclick="doSubmitFinalReport()">
+                    Submit Final Report
+                </button>
+            </div>
         </div>
     </div>
 
@@ -723,6 +850,13 @@
             const s = document.createElement('style');
             s.textContent = '@page { size: A4 landscape; margin: 0.8cm; }';
             document.head.appendChild(s);
+            // Show Submit button only for eselon1 in annual mode
+            if (user.role === 'eselon1') {
+                document.getElementById('btnSubmitFinal').style.display = '';
+                document.getElementById('submitModalTitle').textContent =
+                    'Submit Final Report Tahunan ' + annualTahun;
+                document.getElementById('submitModalYear').textContent = annualTahun;
+            }
             loadAnnualData(annualTahun);
         } else {
             loadReportData();
@@ -936,6 +1070,40 @@
                 hideProgress();
                 btnPdf.disabled = false;
                 btnPrint.disabled = false;
+            }
+        }
+
+        // ── Submit Final Report ───────────────────────────────────
+        function openSubmitModal() {
+            document.getElementById('submitModal').classList.add('active');
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('submitModal').classList.remove('active');
+        }
+
+        async function doSubmitFinalReport() {
+            const btn = document.getElementById('btnDoSubmit');
+            btn.disabled = true; btn.textContent = 'Mengirim...';
+
+            try {
+                const res    = await fetch(AUTH_CONFIG.apiUrl, {
+                    method: 'POST',
+                    body:   new URLSearchParams({ action:'report.final.create', token:getToken(), bulan:'0', tahun:annualTahun })
+                });
+                const result = await res.json();
+                if (!result.success) throw new Error(result.error);
+                closeSubmitModal();
+                const driveInfo = result.data && result.data.drive_url
+                    ? ' File disimpan ke Drive.' : '';
+                showToast('Final report tahunan ' + annualTahun + ' berhasil disubmit.' + driveInfo, 'success');
+                const btnSubmit = document.getElementById('btnSubmitFinal');
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '✓ Sudah Disubmit';
+            } catch(err) {
+                showToast('Gagal submit: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Submit Final Report';
             }
         }
 
