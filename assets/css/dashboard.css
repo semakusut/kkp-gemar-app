@@ -638,40 +638,36 @@ html {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 768px) {
-    /* Layout full-height agar bottom nav selalu terlihat tanpa scroll */
-    html {
-        height: 100vh;
-        height: 100dvh;
+    /* === Mobile PWA layout ===
+       Body tidak scroll → viewport stabil → position:fixed bekerja.
+       .dashboard menjadi satu-satunya scroll container.
+       Ini adalah pola yang dipakai semua mobile app (Instagram, Twitter, dll). */
+    html, body {
+        height: 100%;
     }
 
     body {
-        height: 100vh;
-        height: 100dvh;
-        min-height: 0;
+        overflow: hidden;
         padding-bottom: 0;
     }
 
     .dashboard {
-        display: flex;
-        flex-direction: column;
         height: 100%;
-        /* overflow:hidden mencegah .dashboard menjadi scroll container
-           (overflow-x:hidden di base CSS memicu overflow-y:auto implisit per CSS spec).
-           Hanya .main yang boleh scroll. */
-        overflow: hidden;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
     }
 
-    /* Header disembunyikan di mobile — bottom nav menggantikan navigasi */
+    /* Header disembunyikan — bottom nav menggantikan navigasi */
     .header {
         display: none !important;
     }
 
+    /* Padding bawah: ruang untuk bottom nav yang fixed */
     .main {
-        flex: 1;
-        min-height: 0;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
         padding: 20px 16px;
+        padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
     }
 
     .welcome__title {
@@ -714,15 +710,18 @@ html {
 
 /* ============================================================
    BOTTOM NAV — mobile PWA (Android & iOS thumb-friendly)
-   Tidak pakai position:fixed — lebih reliable di semua browser.
-   Nav menjadi flex child terakhir di .dashboard (flex column).
+   position:fixed bekerja karena body{overflow:hidden} → viewport stabil.
    ============================================================ */
 .bottom-nav {
     display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
     background: #fff;
     border-top: 1px solid rgba(27, 32, 104, 0.10);
-    box-shadow: 0 -2px 16px rgba(13, 15, 34, 0.08);
-    flex-shrink: 0;
+    box-shadow: 0 -4px 24px rgba(13, 15, 34, 0.10);
     padding-bottom: env(safe-area-inset-bottom, 0px);
     padding-left: env(safe-area-inset-left, 0px);
     padding-right: env(safe-area-inset-right, 0px);

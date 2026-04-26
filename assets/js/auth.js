@@ -124,7 +124,8 @@ async function handleLogin() {
     if (result.success) {
       saveSession_(result.data.token, result.data.user, remember);
       if (typeof PageLoader !== 'undefined') PageLoader.setMessage('Masuk berhasil, mengarahkan...');
-      window.location.href = 'dashboard.html';
+      // replace() menghapus halaman login dari history — back button tidak bisa kembali ke sini
+      window.location.replace('dashboard.html');
     } else {
       if (typeof PageLoader !== 'undefined') PageLoader.finish();
       showError_(result.error || 'Login gagal. Periksa email dan password.');

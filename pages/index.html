@@ -183,11 +183,22 @@
     <script src="../assets/js/auth.js"></script>
     <script>
         // Auto-login: jika session masih valid, langsung ke dashboard
-        // Pakai replace() supaya back button tidak balik ke halaman login
-        if (isSessionValid()) {
-            PageLoader.start('Selamat datang kembali...');
-            window.location.replace('dashboard.html');
+        // replace() agar back button tidak bisa kembali ke halaman login
+        function redirectIfLoggedIn() {
+            if (isSessionValid()) {
+                PageLoader.start('Selamat datang kembali...');
+                window.location.replace('dashboard.html');
+            }
         }
+
+        // Cek saat halaman pertama kali dimuat
+        redirectIfLoggedIn();
+
+        // Cek juga saat halaman dipulihkan dari bfcache (back/forward cache iOS/Android).
+        // Event 'load' tidak dipanggil saat bfcache restore — 'pageshow' selalu dipanggil.
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) redirectIfLoggedIn();
+        });
     </script>
     <script>
         (function() {

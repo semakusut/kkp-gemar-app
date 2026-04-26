@@ -97,7 +97,6 @@ function initBottomNav(activePage) {
   });
 
   nav.appendChild(wrap);
-  // Append ke .dashboard agar menjadi flex child terakhir (selalu terlihat di viewport)
-  var container = document.querySelector('.dashboard') || document.body;
-  container.appendChild(nav);
+  // Append langsung ke body — di luar semua wrapper agar position:fixed bekerja
+  document.body.appendChild(nav);
 }
